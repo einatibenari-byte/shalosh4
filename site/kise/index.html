@@ -826,6 +826,27 @@ body{touch-action:manipulation}
 .tagrow .skipb:hover{color:var(--navy)}
 .q:not(.picking .q){padding-bottom:max(6px,calc(var(--qpb,34px) - 22px))}
 @media (max-width:760px){.tagrow{gap:4px}.tagrow .skipb{font-size:12px;padding:0 6px}}
+/* v43 (Lior 11.10): match mode. Three vote buttons, the podium counter = my match %, summary = big % + my votes */
+.tagb,.tagb[data-tag]{background-image:none;aspect-ratio:auto;height:auto;width:clamp(110px,9vw,150px);min-height:0;padding:10px 8px;font-size:var(--fs-l);border-radius:8px;display:grid;place-items:center;line-height:1}
+.tagb[data-tag="F"]{background-color:#7FDDD6}.tagb[data-tag="A"]{background-color:var(--pink)}.tagb[data-tag="B"]{background-color:#E6DFD2}
+.tagbtns{gap:clamp(10px,1.2vw,18px)}
+@media (max-width:760px){.tagbtns{gap:8px;width:100%}.tagb,.tagb[data-tag]{flex:1 1 0;width:auto;max-width:120px;font-size:22px;padding:10px 4px}}
+.ptally{display:flex;justify-content:center}
+.tmatch{display:grid;justify-items:center;line-height:1;padding:2px 0}
+.tmatch small{font-family:var(--body);font-size:var(--fs-xs);color:var(--navy);font-weight:500}
+.tmatch b{font-family:var(--body);font-weight:900;font-size:var(--fs-xl);color:var(--navy);font-variant-numeric:tabular-nums}
+@media (max-width:760px){.tmatch b{font-size:var(--fs-l)}}
+.tcap{display:none!important}
+.smatch{display:grid;justify-items:center;text-align:center;background:var(--cream);border:.9cqi solid var(--frame);outline:.4cqi solid var(--frameD);border-radius:3cqi;padding:2.4cqi 2cqi 2cqi;box-shadow:0 .9cqi 0 var(--frameD);line-height:1}
+.smatch b{font-weight:900;font-size:13cqi;color:var(--navy);font-variant-numeric:tabular-nums}
+.smatch span{font-weight:700;font-size:3.6cqi;color:var(--navy);margin-top:.6cqi}
+.smatch small{font-size:2.8cqi;color:var(--muted);margin-top:1.2cqi;line-height:1.3}
+.smrows{list-style:none;margin:0;padding:0;display:grid;gap:1.2cqi}
+.smrows li{background:#ECE7DE;border-radius:2.4cqi;font-size:3cqi;line-height:1.3;color:#5B5F6E}
+.smrows li a{display:grid;gap:.4cqi;padding:1cqi 2.6cqi;color:inherit;text-decoration:none}
+.smrows li small{font-size:2.5cqi;color:#7C7F8A}
+.smrows li.same{background:#7FDDD6;color:var(--navy)}.smrows li.same small{color:#21524E}
+.slegend .lgs{display:inline-flex;align-items:center;gap:1cqi}.slegend .lgs i{width:3cqi;height:3cqi;border-radius:.8cqi;background:#7FDDD6;display:inline-block}
 </style>
 
 </head>
@@ -868,7 +889,7 @@ const topics = [...new Set(D.votes.map(v => v.topic))].sort((a,b)=>(a==='אחר'
 const $ = id => document.getElementById(id);
 let A, B, queue = [], cur = null, asked = [], topicNow = null;
 let tags = {}, revealed = {}, mode = 'for', auto = false;
-let crowd = {}, crowdN = 0, myStored = {};  // shared tallies from every player (db)  // tags: vote id -> 'K' (כסא) | 'M' (מעשה), set by the player before the reveal
+let crowd = {}, crowdN = 0, myStored = {};  // shared tallies from every player (db)  // tags: vote id -> the player's own vote 'F' (בעד) | 'A' (נגד) | 'B' (נמנע/ת), set before the reveal
 const TAG = {K:'כסא', M:'מעשה'};
 
 function ans(m, v){ return m.v[v.i] }
@@ -940,7 +961,7 @@ function pickScreen(){
   cur = null; $('game').classList.add('picking'); $('sum').hidden = true; $('pager').innerHTML = '';
   $('match').hidden = $('restart').hidden = $('finish').hidden = true;
   $('qcard').innerHTML = `<div class="qbody pickq"><p class="qtext">את מי מביאים לבמה?</p>
-    <p class="ex">בוחרים שני חברי כנסת. אחר כך שואלים אותם על נושאים שחשובים לך, וכל אחד מהם „עונה” לפי מה שהצביע בפועל במליאה.</p>
+    <p class="ex">בוחרים שני חברי כנסת ומצביעים על הצעות חוק אמיתיות. אחרי כל הצבעה רואים מה הם הצביעו בפועל במליאה, ובסוף כמה ההצבעות שלך מתאימות לשלהם.</p>
     <div class="pickrow"><label>מתמודד/ת ראשון/ה${mkInput("selA")}</label><span class="vs">מול</span><label>מתמודד/ת שני/ה${mkInput("selB")}</label></div></div>
     <div class="tagrow"><button class="btn" id="go" disabled>לעלות לבמה</button></div>`;
   const sync = () => { const a = mkById[$('selA').value], b = mkById[$('selB').value];
@@ -984,21 +1005,18 @@ function podium(id, m){
   const face = !m ? '?' : FACES[m.id] ? `<img src="${FACES[m.id]}" alt="">` : initials(m.name);
   $(id).innerHTML = `<div class="pimg"><div class="face${m?'':' empty'}" aria-hidden="true">${face}</div><img src="${PODIUM}" alt="" width="600" height="763">
     <div class="nameplate"><div class="pname">${m?m.name:'?'}</div><div class="pfac">${m?m.faction:'&nbsp;'}</div></div><div class="plate" id="plate-${id}">?</div></div>
-    <div class="ptally" id="tally-${id}">${tallyHTML(...crowdKM(m))}</div><div class="tcap">${m?'לפי הסימונים של כל השחקנים':''}</div>`;
+    <div class="ptally" id="tally-${id}">${tallyHTML(m ? match(m, asked) : null)}</div>`;
   fitPods();
 }
-// per-MK running count for this session: bills the player tagged, where the MK voted for (and, in the "both" mode, against = the opposite tag)
-function podTally(){
-  [['podA',A],['podB',B]].forEach(([id,m]) => {
-    let K = 0, M = 0; if (!m) return;
-    asked.forEach(v => { const t = tags[v], a = ans(m, byId[v]); if (!t) return;
-      if (a === 'F') t === 'K' ? K++ : M++; else if (a === 'A' && mode === 'both') t === 'K' ? M++ : K++ });
-    const el = $('tally-'+id); if (el) el.innerHTML = tallyHTML(K, M);
-  });
-}
-// before the game starts: the running total from every player (bills this MK voted for, by the players' majority mark)
-function crowdKM(m){ if (!m) return [0, 0]; const c = count(m, keys, crowdMaj); return [c.K, c.M] }
-function tallyHTML(K, M){ return `<span class="tK"><span class="tl"><i>כסא</i><b>${K}</b></span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M13 30l-3 14M35 30l3 14M17 31l-1 11M31 31l1 11" stroke="#B9824F" stroke-width="2.6" stroke-linecap="round"/><rect x="13" y="5" width="22" height="20" rx="8" fill="#F29BAA" stroke="#C9687A" stroke-width="1.5"/><rect x="9" y="23" width="30" height="9" rx="4.5" fill="#F4A9B6" stroke="#C9687A" stroke-width="1.5"/></svg></span><span class="tM"><span class="tl"><i>מעשה</i><b>${M}</b></span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 15v-4a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v4" fill="none" stroke="#2F8F86" stroke-width="3"/><rect x="5" y="15" width="38" height="26" rx="4" fill="#4FB3A9" stroke="#2F8F86" stroke-width="1.5"/><path d="M5 25h38" stroke="#2F8F86" stroke-width="1.5"/><rect x="20" y="22" width="8" height="7" rx="1.5" fill="#D9DEE2" stroke="#8D979E" stroke-width="1"/></svg></span>` }
+// match: the bills where both the player and the MK cast a vote (בעד / נגד / נמנע); "didn't take part" and
+// "not in the Knesset yet" are left out. same = how many of those were the same vote.
+const VOTED = a => a === 'F' || a === 'A' || a === 'B';
+function match(m, ids){ let n = 0, same = 0;
+  ids.forEach(id => { const t = tags[id], a = ans(m, byId[id]); if (!VOTED(t) || !VOTED(a)) return; n++; if (t === a) same++ });
+  return {n, same, pct: n ? Math.round(100 * same / n) : null} }
+function podTally(){ [['podA',A],['podB',B]].forEach(([id,m]) => { const el = $('tally-'+id); if (el && m) el.innerHTML = tallyHTML(match(m, asked)) }) }
+function tallyHTML(c){ const pct = c && c.pct !== null ? c.pct + '%' : '—';
+  return `<span class="tmatch" aria-label="התאמה שלך: ${pct}"><small>התאמה</small><b>${pct}</b></span>` }
 function setPlate(id, a){
   const p = $('plate-'+id); p.className = 'plate'; p.textContent = '?';
   if (!a) return;
@@ -1039,10 +1057,9 @@ function show(id, keepPlates){
   const open = auto || revealed[id], c = crowd[id];
   $('qcard').innerHTML = `${icons(v)}<div class="qbody"><p class="qtext">${v.label}</p>
     ${v.ex ? `<p class="ex" id="ex">${v.ex}</p><button class="more" id="more" type="button" hidden>${exOpen===id?'פחות':'עוד'}</button>` : ''}</div>
-    <div class="tagrow${tags[id]?' picked':''}"><span class="tagq sr">${open?'סימנת:':'לפני שחושפים, לדעתך הצבעה בעד היא כדי:'}</span>
-      <span class="hand" aria-hidden="true">לדעתך, הצבעה בעד היא כדי</span>
-      <span class="tagbtns"><button class="tagb" data-tag="K" aria-pressed="${tags[id]==='K'}"><small>לשמור על ה</small>כסא</button><button class="tagb" data-tag="M" aria-pressed="${tags[id]==='M'}"><small>לעשות</small>מעשה</button></span>
-      <button class="skipb" type="button" ${open||tags[id]?'style="visibility:hidden" tabindex="-1"':''}>אין לי דעה / לא רלוונטי</button></div>`;
+    <div class="tagrow${tags[id]?' picked':''}"><span class="tagq sr">${open?'הצבעת:':'לפני שחושפים, איך היית מצביע/ה?'}</span>
+      <span class="hand" aria-hidden="true">ואיך את/ה היית מצביע/ה?</span>
+      <span class="tagbtns">${[['F','בעד'],['A','נגד'],['B','נמנע/ת']].map(([k,w]) => `<button class="tagb" data-tag="${k}" aria-pressed="${tags[id]===k}">${w}</button>`).join('')}</span></div>`;
   $('qcard').closest('.q').classList.toggle('expanded', exOpen===id);
   fit();
   const more = $('more');
@@ -1051,8 +1068,6 @@ function show(id, keepPlates){
   ib.onclick = e => { e.stopPropagation(); const o = !ib.parentNode.classList.contains('open'); ib.parentNode.classList.toggle('open', o); ib.setAttribute('aria-expanded', String(o)) };
   $('pager').innerHTML = dots; podTally();
   if (n > 1) { $('prev').onclick = () => idx>0 && show(list[idx-1]); $('nxt').onclick = () => idx<n-1 && show(list[idx+1]) }
-  // "no opinion / not relevant": shows the votes without a mark, so this bill counts nowhere
-  $('qcard').querySelector('.skipb').onclick = () => { revealed[id] = true; show(id) };
   $('qcard').querySelectorAll('.tagb').forEach(t => t.onclick = () => { tags[id] = t.dataset.tag; const first = !open; revealed[id] = true; saveTags(); show(id, !first) });
   if (open) { if (!keepPlates) { setPlate('podA', a); setPlate('podB', b) } } else { setPlate('podA'); setPlate('podB') }
   chips();
@@ -1110,27 +1125,13 @@ const DOC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.8h8l4.2 4
 const LOGO = document.querySelector('h1.logo img').src;
 const voteUrl = id => `https://main.knesset.gov.il/Activity/plenum/Votes/Pages/vote.aspx?voteId=${id}`;
 const fem = m => m.g === 'f';
-function crowdMaj(id){ const c = crowd[id]; if (!c) return null; return c.M > c.K ? 'M' : c.K > c.M ? 'K' : null }
-// bills the MK voted for, by mark; ids = which bills, mark(id) = 'K' | 'M' | null
-function count(m, ids, mark){ let K=0, M=0, any=false; ids.forEach(id=>{ const t = mark(id); if (!t) return; any = true; if (ans(m,byId[id])==='F') t==='K'?K++:M++ }); return {K, M, none: !any} }
-function headline(m, c, mine){
-  const g = (fe, ma) => fem(m) ? fe : ma;
-  if (c.none) return mine ? 'עוד לא סימנת כסא או מעשה.' : 'עוד אין מספיק משחקים.';
-  if (c.M + c.K === 0) return g('לא הצביעה בעד אף הצעה שסומנה.', 'לא הצביע בעד אף הצעה שסומנה.');
-  if (c.K === 0 && c.M >= 3) return g('כולה מעשים, אפס כסא.', 'כולו מעשים, אפס כסא.');
-  if (c.M === 0 && c.K >= 3) return g('כולה כסא, אפס מעשים.', 'כולו כסא, אפס מעשים.');
-  if (c.M > c.K) return g('דואגת יותר לעשות ופחות לכסא שלה.', 'דואג יותר לעשות ופחות לכסא שלו.');
-  if (c.K > c.M) return g('דואגת יותר לכסא מאשר למעשים.', 'דואג יותר לכסא מאשר למעשים.');
-  return 'חצי מעשה, חצי כסא.';
-}
-function pill(v, mark){ const t = mark ? tags[v.id] : null;
-  return `<li class="${t||''}"><a href="${voteUrl(v.id)}" target="_blank" rel="noopener">${t==='K'?CHAIR:t==='M'?BOX:''}<span>${v.label}</span></a></li>` }
+function pill(v){ return `<li><a href="${voteUrl(v.id)}" target="_blank" rel="noopener"><span>${v.label}</span></a></li>` }
 function cols(m, vs, mark, cap){
   const F = vs.filter(v=>ans(m,v)==='F'), Ag = vs.filter(v=>ans(m,v)==='A');
   let cf = 0, ca = 0;
   if (cap){ const tot = F.length+Ag.length; if (tot>cap){ cf = Math.min(F.length, Math.max(1, Math.round(cap*F.length/tot))); ca = Math.max(0, cap-cf) || 1 } }
   const list = (xs, c) => { if (!xs.length) return '<li class="none">אין</li>';
-    const shown = c ? xs.slice(0,c) : xs; return shown.map(v=>pill(v,mark)).join('') + (xs.length>shown.length?`<li class="more">ועוד ${xs.length-shown.length}</li>`:'') };
+    const shown = c ? xs.slice(0,c) : xs; return shown.map(v=>pill(v)).join('') + (xs.length>shown.length?`<li class="more">ועוד ${xs.length-shown.length}</li>`:'') };
   const rest = vs.filter(v=>!'FA'.includes(ans(m,v)));
   // balanced sides sit side by side; otherwise the fuller side goes first, the other under it
   const nf = F.length, na = Ag.length, even = Math.min(nf, na) >= Math.max(nf, na) / 2 && Math.min(nf, na) > 0;
@@ -1152,46 +1153,27 @@ function podTop(m, sign, head, board, sub){
   return `<div class="stop">
       <div class="spod"><div class="sface" aria-hidden="true">${FACES[m.id]?`<img src="${FACES[m.id]}" alt="">`:initials(m.name)}</div><img src="${PODIUM}" alt="" width="600" height="763">
         <div class="snp"><b>${m.name}</b><small>${m.faction}</small></div><div class="ssign">${sign}</div></div>
-      <div class="sright"><p class="shead">${head}</p>${board}${sub?`<p class="stopics">${sub}</p>`:''}</div>
+      <div class="sright">${head?`<p class="shead">${head}</p>`:''}${board}${sub?`<p class="stopics">${sub}</p>`:''}</div>
     </div>`;
 }
+// the player's votes next to the MK's: every bill the player voted on, grey; teal where both voted the same
+const MYW = {F:'בעד', A:'נגד', B:'נמנע/ת'};
+function mkWord(m, a){ const f = fem(m); return a==='F'?'בעד':a==='A'?'נגד':a==='B'?(f?'נמנעה':'נמנע'):a==='-'?(f?'לא הייתה בכנסת':'לא היה בכנסת'):(f?'לא השתתפה':'לא השתתף') }
 function card(m){
-  const marked = asked.filter(id=>tags[id]);
-  const me = count(m, marked, id=>tags[id]), all = count(m, keys, crowdMaj);
-  const key = D.headline.map(id=>byId[id]), qs = marked.map(id=>byId[id]);
-  const topics = [...new Set(qs.map(v=>v.topic))], showAll = dbOn && crowdN > 0;
-  const board = `<div class="sboard" role="img" aria-label="במשחק הזה: כסא ${me.K}, מעשה ${me.M}${showAll?`. בכל המשחקים: כסא ${all.K}, מעשה ${all.M}`:''}">
-      <div><b>${me.K}</b>${showAll?`<small class="sallc">כולם: <b>${all.K}</b></small>`:''}</div><div><b>${me.M}</b>${showAll?`<small class="sallc">כולם: <b>${all.M}</b></small>`:''}</div></div>`;
+  const f = fem(m), voted = asked.filter(id=>VOTED(tags[id])), qs = voted.map(id=>byId[id]), c = match(m, voted);
+  const pct = c.pct === null ? '—' : c.pct + '%';
+  const line = c.n ? `הצבעת כמו${f?'ה':'הו'} ב־${c.same} מתוך ${c.n}` : voted.length ? `${f?'היא לא הצביעה':'הוא לא הצביע'} בהצעות שהצבעת עליהן` : 'עוד לא הצבעת על אף הצעה';
+  const big = `<div class="smatch" role="img" aria-label="התאמה ${pct}. ${line}"><b>${pct}</b><span>התאמה</span><small>${line}</small></div>`;
+  const topics = [...new Set(qs.map(v=>v.topic))];
+  const rows = qs.map(v => { const t = tags[v.id], a = ans(m, v), same = t === a;
+    return `<li class="${same?'same':''}"><a href="${voteUrl(v.id)}" target="_blank" rel="noopener"><span>${v.label}</span><small>את/ה: ${MYW[t]} · ${f?'היא':'הוא'}: ${mkWord(m, a)}</small></a></li>` }).join('');
   return `<div class="cw"><article class="scard" aria-label="כרטיס סיכום: ${m.name}">
-    ${podTop(m, `${qs.length} ${qs.length===1?'הצעה סומנה':'הצעות סומנו'}`, headline(m, me, true), board, topics.length?`${topics.length>1?'בנושאים':'בנושא'} שעלה במשחק: <b>${topics.join(', ')}</b>`:'')}
-    ${qs.length?`<div class="sblk"><h3>ההצבעות במשחק הזה <span class="slegend"><span>${BOX}סימנת מעשה</span><span>${CHAIR}סימנת כסא</span></span></h3>${cols(m,qs,true,0)}</div>`:''}
-    <div class="sblk"><h3>הצבעות מרכזיות</h3>${cols(m,key,false,0)}</div>
+    ${podTop(m, `${qs.length} ${qs.length===1?'הצבעה':'הצבעות'}`, '', big, topics.length?`${topics.length>1?'בנושאים':'בנושא'} שעלה במשחק: <b>${topics.join(', ')}</b>`:'')}
+    ${qs.length?`<div class="sblk"><h3>ההצבעות במשחק הזה <span class="slegend"><span class="lgs"><i></i>הצבעתם אותו דבר</span></span></h3><ul class="smrows">${rows}</ul></div>`:''}
+    <div class="sblk"><h3>הצבעות מרכזיות</h3>${cols(m,D.headline.map(id=>byId[id]),false,0)}</div>
     ${allVotes(m)}
     <div class="sfoot"><span>מקור: הצבעות מליאת הכנסת ה־25</span><button class="sharebtn" data-share="${m.id}">לשתף</button><img src="${LOGO}" alt="כסא או מעשה"></div>
   </article></div>`;
-}
-// share: a two-page 9:16 story per MK. 1 = my game, 2 = every game played so far
-function story(m, page, total){
-  const f = fem(m), qs = asked.map(id=>byId[id]), key = D.headline.map(id=>byId[id]);
-  const c = page===1 ? count(m, asked, id=>tags[id]) : count(m, D.votes.map(v=>v.id), crowdMaj);
-  const nInit = Object.entries(INIT[m.id]||{}).filter(([b,r])=>r==='ראשי' && D.votes.some(v=>String(v.bill)===b)).length;
-  const body = page===1
-    ? `<div class="sblk"><h3>ההצבעות במשחק שלי</h3>${cols(m,qs,true,5)}</div>`
-    : `<div class="sblk"><h3>הצבעות מרכזיות</h3>${cols(m,key,false,6)}</div>
-       ${nInit?`<p class="sinitline"><span class="sinit">${nInit===1?'יוזמה אחת':nInit+' יוזמות'} ${f?'שלה':'שלו'}</span> בין ההצעות שבמשחק</p>`:''}`;
-  return `<article class="scard sstory" aria-label="סטורי ${page} מתוך ${total}: ${m.name}">
-    <div class="spg"><span>${page===1?'המשחק שלי':'כלל המשחקים'}</span>${total>1?`<i>${page}/${total}</i>`:''}</div>
-    ${podTop(m, page===1?`${qs.length} הצבעות נבדקו`:`${crowdN.toLocaleString('he')} משחקים`, headline(m, c, page===1),
-      `<div class="sboard" role="img" aria-label="כסא ${c.K}, מעשה ${c.M}"><div><i>כסא</i><b>${c.K}</b></div><div><i>מעשה</i><b>${c.M}</b></div></div>`,
-      page===1?'לפי הסימון שלי':'לפי מה שרוב המשתתפים סימנו, על כל ההצבעות במשחק')}
-    ${body}
-    <div class="sfoot"><span>מקור: הצבעות מליאת הכנסת ה־25</span><img src="${LOGO}" alt="כסא או מעשה"></div>
-  </article>`;
-}
-function shareText(m){
-  const qs = asked.map(id=>byId[id]), c = count(m, asked, id=>tags[id]);
-  const l = (k, vs) => vs.filter(v=>ans(m,v)===k).map(v=>'• '+v.label).join('\n') || '—';
-  return `כסא או מעשה: ${m.name} (${m.faction})\n${headline(m, c, true)}\nכסא ${c.K} · מעשה ${c.M}\n\nבעד:\n${l('F', qs)}\n\nנגד:\n${l('A', qs)}\n\nמקור: הצבעות מליאת הכנסת ה־25`;
 }
 // share = the story card(s) as images: the phone's share sheet when it can take files, otherwise a download,
 // and the images stay on screen so a long press can save them too
@@ -1247,40 +1229,6 @@ async function shareCard(m, el, btn){
     catch (e) { st.textContent = 'אפשר ללחוץ לחיצה ארוכה על התמונה ולשמור.' } };
   ov.querySelector('#shcp').onclick = async () => { try { await navigator.clipboard.writeText(SITE); st.textContent = 'הקישור הועתק.' } catch (e) { st.textContent = SITE } };
 }
-function openShare(m){
-  const pages = dbOn && crowdN ? [1, 2] : [1];
-  const ov = document.createElement('div'); ov.className = 'shareov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','שיתוף: '+m.name);
-  ov.innerHTML = `<div class="sharebox"><button class="sclose" aria-label="סגירה">×</button>
-    <div class="spair">${pages.map(p=>`<div class="shot"><div class="cw">${story(m,p,pages.length)}</div></div>`).join('')}</div>
-    <div class="row"><button class="btn" id="shimg">לשתף כתמונה</button><span class="note" role="status" id="sst"></span></div></div>`;
-  document.body.appendChild(ov); const close = () => ov.remove();
-  ov.querySelector('.sclose').onclick = close; ov.onclick = e => { if (e.target === ov) close() };
-  ov.addEventListener('keydown', e => { if (e.key === 'Escape') close() }); ov.querySelector('.sclose').focus();
-  const st = ov.querySelector('#sst'), btn = ov.querySelector('#shimg');
-  btn.onclick = async () => {
-    btn.disabled = true; st.textContent = 'מכינים תמונה...';
-    try {
-      const lib = await loadH2I(), shots = [...ov.querySelectorAll('.shot')];
-      const blobs = [];
-      for (const s of shots) blobs.push(await lib.toBlob(s, {pixelRatio: 1080 / s.offsetWidth, cacheBust: false}));
-      const name = i => `kise-o-maase-${m.id}${shots.length>1?'-'+(i+1):''}.png`;
-      const files = blobs.map((bl, i) => new File([bl], name(i), {type: 'image/png'}));
-      // show the images in place of the live cards, so long-press save always works
-      shots.forEach((s, i) => { s.innerHTML = `<img src="${URL.createObjectURL(blobs[i])}" alt="${m.name}: כסא או מעשה">` });
-      const dl = await dlCap;
-      if (dl) {
-        // inside the Claude viewer: its save sheet (the share sheet on iPhone)
-        for (const f of files) { try { await dl.save({filename: f.name, data: f}); st.textContent = '' } catch (e) { st.textContent = e.code === 'declined' ? '' : 'אפשר ללחוץ לחיצה ארוכה על התמונה ולשמור אותה.'; break } }
-      } else if (navigator.canShare && navigator.canShare({files})) {
-        try { await navigator.share({files, title: 'כסא או מעשה'}); st.textContent = ''; } catch (e) { st.textContent = e.name === 'AbortError' ? '' : 'אפשר ללחוץ לחיצה ארוכה על התמונה ולשמור אותה.' }
-      } else {
-        files.forEach(f => { const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); a.remove() });
-        st.textContent = 'התמונה ירדה. אפשר גם ללחוץ עליה לחיצה ארוכה ולשמור.';
-      }
-    } catch (e) { st.textContent = 'לא הצלחנו להכין תמונה. אפשר לצלם את המסך.' }
-    btn.disabled = false;
-  };
-}
 // podium names: as big as the sign allows, on one line (in cqi so a shared image keeps the size)
 function fitNames(root){ root.querySelectorAll('.snp').forEach(p => { const b = p.querySelector('b'), sm = p.querySelector('small');
   b.style.fontSize = sm.style.fontSize = '';
@@ -1304,10 +1252,7 @@ $('finish').onclick = (stay) => {
 // Functions in front of Supabase); inside the Claude viewer it uses the artifact db. One mark per player per bill either way.
 const BACKEND = 'site';
 let dbOn = false;
-const recrowd = (agg, n) => { crowd = agg; crowdN = n;
-  if ($('game').classList.contains('picking')) { podium('podA', mkById[$('selA')?.value]); podium('podB', mkById[$('selB')?.value]) }
-  if (cur && !$('game').hidden) show(cur, true);
-  if (!$('sum').hidden) $('finish').onclick(true) };
+const recrowd = (agg, n) => { crowd = agg; crowdN = n };  // kept for later use; the game shows only the player's own match
 let saveTags = async () => {}, sendReport = async () => false;
 if (BACKEND === 'site') {
   const KEY = 'kise-player', newId = () => crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () => (Math.random()*16|0).toString(16));
@@ -1318,8 +1263,7 @@ if (BACKEND === 'site') {
     const t = {}; for (const k in tags) if (sent[k] !== tags[k]) t[k] = tags[k];
     if (!Object.keys(t).length) return;
     try { const r = await fetch('/api/tags', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({player: me, tags: t}), keepalive: true});
-      if (r.ok) { Object.assign(sent, t); pull() } } catch (e) { /* offline: keep playing locally */ } };
-  pull(); setInterval(() => { if (!document.hidden) pull() }, 60000);
+      if (r.ok) Object.assign(sent, t) } catch (e) { /* offline: keep playing locally */ } };
   sendReport = async (vote, text) => { try { return (await fetch('/api/report', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({vote, text})})).ok } catch (e) { return false } };
 } else {
   let myRef = null;

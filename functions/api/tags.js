@@ -1,4 +1,4 @@
-// POST /api/tags  {player: uuid, tags: {voteId: 'K' | 'M'}}  — one mark per player per bill; a later mark replaces the earlier one
+// POST /api/tags  {player: uuid, tags: {voteId: 'F' | 'A' | 'B'}}  — the player's own vote per bill (בעד / נגד / נמנע); a later vote replaces the earlier one
 import { json, sb, UUID } from './_supabase.js';
 
 export async function onRequestPost({ request, env }) {
@@ -7,7 +7,7 @@ export async function onRequestPost({ request, env }) {
   const { player, tags } = body || {};
   if (!UUID.test(player || '') || !tags || typeof tags !== 'object') return json({ error: 'bad request' }, 400);
   const rows = Object.entries(tags)
-    .filter(([id, t]) => /^\d{1,9}$/.test(id) && (t === 'K' || t === 'M'))
+    .filter(([id, t]) => /^\d{1,9}$/.test(id) && (t === 'F' || t === 'A' || t === 'B'))
     .slice(0, 700)
     .map(([id, t]) => ({ player_id: player, vote_id: +id, tag: t, updated_at: new Date().toISOString() }));
   if (!rows.length) return json({ saved: 0 });

@@ -809,4 +809,25 @@ body{touch-action:manipulation}
 .tagrow .skipb:hover{color:var(--navy)}
 .q:not(.picking .q){padding-bottom:max(6px,calc(var(--qpb,34px) - 22px))}
 @media (max-width:760px){.tagrow{gap:4px}.tagrow .skipb{font-size:12px;padding:0 6px}}
+/* v43 (Lior 11.10): match mode. Three vote buttons, the podium counter = my match %, summary = big % + my votes */
+.tagb,.tagb[data-tag]{background-image:none;aspect-ratio:auto;height:auto;width:clamp(110px,9vw,150px);min-height:0;padding:10px 8px;font-size:var(--fs-l);border-radius:8px;display:grid;place-items:center;line-height:1}
+.tagb[data-tag="F"]{background-color:#7FDDD6}.tagb[data-tag="A"]{background-color:var(--pink)}.tagb[data-tag="B"]{background-color:#E6DFD2}
+.tagbtns{gap:clamp(10px,1.2vw,18px)}
+@media (max-width:760px){.tagbtns{gap:8px;width:100%}.tagb,.tagb[data-tag]{flex:1 1 0;width:auto;max-width:120px;font-size:22px;padding:10px 4px}}
+.ptally{display:flex;justify-content:center}
+.tmatch{display:grid;justify-items:center;line-height:1;padding:2px 0}
+.tmatch small{font-family:var(--body);font-size:var(--fs-xs);color:var(--navy);font-weight:500}
+.tmatch b{font-family:var(--body);font-weight:900;font-size:var(--fs-xl);color:var(--navy);font-variant-numeric:tabular-nums}
+@media (max-width:760px){.tmatch b{font-size:var(--fs-l)}}
+.tcap{display:none!important}
+.smatch{display:grid;justify-items:center;text-align:center;background:var(--cream);border:.9cqi solid var(--frame);outline:.4cqi solid var(--frameD);border-radius:3cqi;padding:2.4cqi 2cqi 2cqi;box-shadow:0 .9cqi 0 var(--frameD);line-height:1}
+.smatch b{font-weight:900;font-size:13cqi;color:var(--navy);font-variant-numeric:tabular-nums}
+.smatch span{font-weight:700;font-size:3.6cqi;color:var(--navy);margin-top:.6cqi}
+.smatch small{font-size:2.8cqi;color:var(--muted);margin-top:1.2cqi;line-height:1.3}
+.smrows{list-style:none;margin:0;padding:0;display:grid;gap:1.2cqi}
+.smrows li{background:#ECE7DE;border-radius:2.4cqi;font-size:3cqi;line-height:1.3;color:#5B5F6E}
+.smrows li a{display:grid;gap:.4cqi;padding:1cqi 2.6cqi;color:inherit;text-decoration:none}
+.smrows li small{font-size:2.5cqi;color:#7C7F8A}
+.smrows li.same{background:#7FDDD6;color:var(--navy)}.smrows li.same small{color:#21524E}
+.slegend .lgs{display:inline-flex;align-items:center;gap:1cqi}.slegend .lgs i{width:3cqi;height:3cqi;border-radius:.8cqi;background:#7FDDD6;display:inline-block}
 </style>
