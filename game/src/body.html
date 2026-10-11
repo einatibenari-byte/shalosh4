@@ -526,10 +526,11 @@ $('qcard').addEventListener('click', e => { const r = e.target.closest('[data-re
 function lockScroll(){ document.documentElement.classList.toggle('lock', $('sum').hidden) }
 new MutationObserver(lockScroll).observe($('sum'), {attributes: true, attributeFilter: ['hidden']}); lockScroll();
 // the visible height (phones hide part of 100dvh behind browser or app bars)
-const appH = () => { const r = document.documentElement.style, vh = window.visualViewport ? visualViewport.height : innerHeight;
+const appH = () => { if (document.activeElement?.matches?.('input,textarea')) return;  // the phone keyboard is open: keep the layout as it was
+  const r = document.documentElement.style, vh = window.visualViewport ? visualViewport.height : innerHeight;
   const z = parseFloat(getComputedStyle(document.querySelector('.wrap')).zoom) || 1, nav = $('topnav').getBoundingClientRect().height;
   r.setProperty('--apph', Math.round(vh) + 'px'); r.setProperty('--stageh', Math.round((vh - nav) / z) + 'px') };
-appH(); addEventListener('resize', appH); try { new ResizeObserver(appH).observe($('topnav')) } catch (e) {} window.visualViewport?.addEventListener('resize', appH);
+appH(); addEventListener('resize', appH); addEventListener('focusout', () => setTimeout(appH, 350)); try { new ResizeObserver(appH).observe($('topnav')) } catch (e) {} window.visualViewport?.addEventListener('resize', appH);
 { const vp = document.querySelector('meta[name=viewport]'); if (vp && !/maximum-scale/.test(vp.content)) vp.content += ',maximum-scale=1' }
 const navH = () => document.documentElement.style.setProperty('--navh', $('topnav').offsetHeight + 'px');
 try { new ResizeObserver(navH).observe($('topnav')) } catch (e) { addEventListener('resize', navH) }
