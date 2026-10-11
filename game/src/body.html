@@ -209,7 +209,8 @@ function show(id, keepPlates){
     ${v.ex ? `<p class="ex" id="ex">${v.ex}</p><button class="more" id="more" type="button" hidden>${exOpen===id?'פחות':'עוד'}</button>` : ''}</div>
     <div class="tagrow${tags[id]?' picked':''}"><span class="tagq sr">${open?'סימנת:':'לפני שחושפים, לדעתך הצבעה בעד היא כדי:'}</span>
       <span class="hand" aria-hidden="true">לדעתך, הצבעה בעד היא כדי</span>
-      <span class="tagbtns"><button class="tagb" data-tag="K" aria-pressed="${tags[id]==='K'}"><small>לשמור על ה</small>כסא</button><button class="tagb" data-tag="M" aria-pressed="${tags[id]==='M'}"><small>לעשות</small>מעשה</button></span></div>`;
+      <span class="tagbtns"><button class="tagb" data-tag="K" aria-pressed="${tags[id]==='K'}"><small>לשמור על ה</small>כסא</button><button class="tagb" data-tag="M" aria-pressed="${tags[id]==='M'}"><small>לעשות</small>מעשה</button></span>
+      <button class="skipb" type="button" ${open||tags[id]?'style="visibility:hidden" tabindex="-1"':''}>אין לי דעה / לא רלוונטי</button></div>`;
   $('qcard').closest('.q').classList.toggle('expanded', exOpen===id);
   fit();
   const more = $('more');
@@ -218,6 +219,8 @@ function show(id, keepPlates){
   ib.onclick = e => { e.stopPropagation(); const o = !ib.parentNode.classList.contains('open'); ib.parentNode.classList.toggle('open', o); ib.setAttribute('aria-expanded', String(o)) };
   $('pager').innerHTML = dots; podTally();
   if (n > 1) { $('prev').onclick = () => idx>0 && show(list[idx-1]); $('nxt').onclick = () => idx<n-1 && show(list[idx+1]) }
+  // "no opinion / not relevant": shows the votes without a mark, so this bill counts nowhere
+  $('qcard').querySelector('.skipb').onclick = () => { revealed[id] = true; show(id) };
   $('qcard').querySelectorAll('.tagb').forEach(t => t.onclick = () => { tags[id] = t.dataset.tag; const first = !open; revealed[id] = true; saveTags(); show(id, !first) });
   if (open) { if (!keepPlates) { setPlate('podA', a); setPlate('podB', b) } } else { setPlate('podA'); setPlate('podB') }
   chips();
