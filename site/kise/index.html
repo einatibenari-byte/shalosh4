@@ -1028,6 +1028,16 @@ body{touch-action:manipulation}
 .qhead{margin-top:-6px!important;margin-bottom:0!important}
 .q .info{top:8px!important}
 .q .qbody:not(.pickq):not(.idleq) .qtext{margin-top:16px!important}
+/* v51: the end-of-topic card fits (all three buttons), its header clear of the title; the chosen topic chip can sit away from the faded edge */
+.endq{gap:8px!important;justify-content:center!important}
+.endq .qtext{margin-top:10px!important}
+.endq .ex{margin:0!important;font-size:var(--fs-s)!important;line-height:1.4}
+.endq .endrow{gap:6px!important;margin-top:2px!important}
+.endq .endrow button{padding:6px 12px!important;font-size:var(--fs-s)!important;border-width:1.5px}
+@media (max-width:760px){.endq .qtext{font-size:var(--fs-l)!important}.endq .endrow button{padding:5px 10px!important;font-size:15px!important}}
+.chips::before{content:""!important;flex:0 0 calc(50% - 70px)!important}
+.chips::after{content:"";flex:0 0 calc(50% - 70px)}
+.chip:not([aria-pressed="true"]){background:rgba(255,255,255,.26)!important}
 </style>
 
 </head>
