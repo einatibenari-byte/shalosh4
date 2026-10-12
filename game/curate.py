@@ -44,12 +44,12 @@ FAC = [('הליכוד', 'c', ['1096']), ('ש"ס', 'c', ['1095']), ('יהדות �
        ('עוצמה יהודית', 'c', ['1106']), ('הימין הממלכתי', 'c', ['1108']), ('יש עתיד', 'o', ['1102']),
        ('כחול לבן – המחנה הממלכתי', 'o', ['1098', '1110']), ('ישראל ביתנו', 'o', ['1104']), ('העבודה', 'o', ['1100']),
        ('חד"ש-תע"ל', 'o', ['1103']), ('רע"ם', 'o', ['1099'])]
-# the faction head shown in the podium oval (Lior 12.10); PersonIDs. Smotrich is not among the game's MKs, so no photo yet.
-# Labor: Merav Michaeli led the faction until 2024; the party leader since (Yair Golan) is not an MK.
+# the faction head shown in the podium oval (Lior 12.10); PersonIDs. Smotrich's photo: Lior 12.10.
+# Labor: Naama Lazimi (Lior 12.10); the party leader Yair Golan was not an MK in Knesset 25 (K23-24 only, KNS_PersonToPosition).
 HEAD = {'הליכוד': (965, 'בנימין נתניהו'), 'ש"ס': (2291, 'אריה דרעי'), 'יהדות התורה': (30846, 'יצחק גולדקנופף'),
-        'הציונות הדתית': (None, 'בצלאל סמוטריץ׳'), 'עוצמה יהודית': (30811, 'איתמר בן גביר'), 'הימין הממלכתי': (1027, 'גדעון סער'),
+        'הציונות הדתית': (30055, 'בצלאל סמוטריץ׳'), 'עוצמה יהודית': (30811, 'איתמר בן גביר'), 'הימין הממלכתי': (1027, 'גדעון סער'),
         'יש עתיד': (23594, 'יאיר לפיד'), 'כחול לבן – המחנה הממלכתי': (30657, 'בני גנץ'), 'ישראל ביתנו': (427, 'אביגדור ליברמן'),
-        'העבודה': (23565, 'מרב מיכאלי'), 'חד"ש-תע"ל': (30066, 'איימן עודה'), 'רע"ם': (30713, 'מנסור עבאס')}
+        'העבודה': (30106, 'נעמה לזימי'), 'חד"ש-תע"ל': (30066, 'איימן עודה'), 'רע"ם': (30713, 'מנסור עבאס')}
 spans = collections.defaultdict(list)   # FactionID -> [(PersonID, start, end)]
 for r in csv.DictReader(open(os.path.join(H, 'kns_persontoposition.csv'), encoding='utf-8')):
     if r['KnessetNum'] == '25' and r['FactionID']:
