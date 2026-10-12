@@ -950,4 +950,20 @@ body{touch-action:manipulation}
 @media (max-width:560px){.shimgs .shimgprev{width:70%}}
 @media (min-width:761px){.q .qbody .qtext{font-size:calc(var(--fs-l) * 1.12)!important}.tagb,.tagb[data-tag]{width:clamp(120px,9vw,160px)!important;padding:10px 8px!important;font-size:var(--fs-m)!important}.q .qbody .more{font-size:var(--fs-s)!important}.qhead{font-size:var(--fs-s)!important}.hand{font-size:calc(var(--fs-m) * 1.1)}}
 @media (max-width:760px){.topq .tpick{padding-bottom:4px}}
+
+/* v48 (Lior 12.10): opening cards centred top-to-bottom, bold intro text, the short podium image before the game */
+.pimg>img.pshort{display:none!important}
+.picking .pimg>img.pfull,.choosing .pimg>img.pfull{display:none!important}
+.picking .pimg>img.pshort,.choosing .pimg>img.pshort{display:block!important}
+.picking .pimg,.choosing .pimg{clip-path:none!important;transform:none!important}
+.picking .pimg .nameplate,.choosing .pimg .nameplate{top:58.8%!important;height:15.1%!important;left:19.3%!important;width:60.8%!important}
+.picking .face,.choosing .face{left:49.8%!important}
+.introq .ex,.introq.i1 .ex{font-weight:700}
+.picking .desk,.choosing .desk{justify-content:center!important}
+@media (max-width:760px){.picking .desk,.choosing .desk{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center!important;min-height:0}}
+@media (max-width:760px) and (max-height:700px){.intro .pods{display:none!important}}
+.shfig{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.shfig .shone{font-size:var(--fs-s);padding:8px 14px}
+.shimgs .shfig{flex:0 0 auto;width:min(46%,240px);scroll-snap-align:start}.shimgs .shfig .shimgprev{width:100%}
+@media (max-width:560px){.shimgs .shfig{width:70%}}
 </style>
