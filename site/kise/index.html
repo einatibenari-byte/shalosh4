@@ -847,6 +847,8 @@ body{touch-action:manipulation}
 .smrows li small{font-size:2.5cqi;color:#7C7F8A}
 .smrows li.same{background:#7FDDD6;color:var(--navy)}.smrows li.same small{color:#21524E}
 .slegend .lgs{display:inline-flex;align-items:center;gap:1cqi}.slegend .lgs i{width:3cqi;height:3cqi;border-radius:.8cqi;background:#7FDDD6;display:inline-block}
+/* v44: picker list scrolls by touch */
+.mkres{touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 </style>
 
 </head>
@@ -954,7 +956,9 @@ function mkCombo(id){
     else if (e.key === 'Enter') { e.preventDefault(); const m = hits[at < 0 ? 0 : at]; if (m) choose(m) }
     else if (e.key === 'Escape') close() };
   inp.onblur = () => setTimeout(() => { if (document.activeElement !== inp) { close(); const m = mkById[sel.value]; inp.value = m ? m.name : '' } }, 150);
-  res.addEventListener('pointerdown', e => { if (res.dataset.for !== id) return; const li = e.target.closest('li[data-i]'); if (!li) return; e.preventDefault(); choose(hits[+li.dataset.i]) });
+  // mousedown keeps focus in the input; selecting on click lets a finger scroll the list without picking
+  res.addEventListener('mousedown', e => { if (res.dataset.for === id) e.preventDefault() });
+  res.addEventListener('click', e => { if (res.dataset.for !== id) return; const li = e.target.closest('li[data-i]'); if (li) choose(hits[+li.dataset.i]) });
   addEventListener('resize', () => { if (!res.hidden && res.dataset.for === id) place() });
 }
 function pickScreen(){
