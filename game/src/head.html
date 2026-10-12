@@ -832,4 +832,30 @@ body{touch-action:manipulation}
 .slegend .lgs{display:inline-flex;align-items:center;gap:1cqi}.slegend .lgs i{width:3cqi;height:3cqi;border-radius:.8cqi;background:#7FDDD6;display:inline-block}
 /* v44: picker list scrolls by touch */
 .mkres{touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+/* v45: shorter game: tabs MK/faction, list sections, topic chooser, explanation on request, end-of-topic row, per-topic summary */
+.kind{display:inline-flex;align-self:center;background:rgba(255,255,255,.55);border-radius:999px;padding:3px;gap:2px}
+.kind [role=tab]{border:0;background:none;border-radius:999px;padding:6px 18px;font:inherit;font-size:var(--fs-s);color:var(--navy);cursor:pointer}
+.kind [role=tab][aria-selected="true"]{background:var(--navy);color:#fff}
+.mkres li.hdr{display:block;cursor:default;padding:10px 10px 4px;font-size:.78em;font-weight:700;color:#2B7C74;background:none!important;position:sticky;top:-6px;background:#fff!important;z-index:1}
+.face .fname,.sface .fname{display:grid;place-items:center;width:100%;height:100%;padding:8%;box-sizing:border-box;text-align:center;font-family:var(--body);font-weight:700;font-size:clamp(10px,1vw,15px);line-height:1.15;color:#fff;background:radial-gradient(circle at 50% 38%,#3E86C6,#24507A)}
+.sface .fname{font-size:3cqi}
+.topq .tpick{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:720px}
+.tp{border:2px solid #CFE7E3;background:#fff;color:var(--navy);border-radius:999px;padding:7px 16px;font:inherit;font-size:var(--fs-s);cursor:pointer}
+.tp[aria-pressed="true"]{background:#7FDDD6;border-color:#7FDDD6;font-weight:700}
+.btn:disabled{opacity:.45;cursor:default}
+.qbody .more{align-self:flex-start;margin-top:0}
+.endrow{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:2px}
+.endrow button{border:2px solid var(--navy);background:#fff;color:var(--navy);border-radius:999px;padding:6px 14px;font:inherit;font-size:var(--fs-s);font-weight:500;cursor:pointer}
+.endrow button.solid{background:var(--navy);color:#fff}
+.stopic{list-style:none;margin:0;padding:0;display:grid;gap:1.4cqi}
+.stopic li{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;align-items:center;gap:2cqi;font-size:3.2cqi}
+.stopic .tbar{height:2.4cqi;border-radius:99px;background:#ECE7DE;overflow:hidden}
+.stopic .tbar i{display:block;height:100%;background:#2FA79C;border-radius:99px}
+.stopic b{min-width:5ch;text-align:left}
+.stopic .tno{grid-column:2/4;color:var(--muted);font-size:.85em}
+@media (max-width:760px){.kind [role=tab]{padding:5px 14px;font-size:14px}.tp{padding:5px 12px;font-size:14px}.endrow button{padding:5px 11px;font-size:14px}.topq .tpick{gap:6px}}
+/* v45b: topic chooser grows on phones; the end row takes the place of the prompt line */
+@media (max-width:760px){.q .qbody.topq{overflow-y:auto;justify-content:flex-start;gap:8px}.topq .ex{display:none}.topq .qtext{padding-bottom:4px}.topq .tpick{gap:5px}.topq .tp{padding:4px 10px;font-size:13px}}
+.tagrow:has(.endrow) .hand{display:none}
+@media (max-width:420px){.endrow{flex-wrap:nowrap;gap:5px}.endrow button{padding:4px 9px;font-size:13px;white-space:nowrap}}
 </style>

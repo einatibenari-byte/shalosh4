@@ -32,10 +32,14 @@ const ANS = {F:'בעד', A:'נגד', B:'נמנע/ת', N:'לא השתתף/ה בה
 const keys = D.votes.map(v => v.id);
 const byId = Object.fromEntries(D.votes.map((v,i) => [v.id, Object.assign(v,{i})]));
 const mkById = Object.fromEntries(D.mks.map(m => [m.id, m]));
-const topics = [...new Set(D.votes.map(v => v.topic))].sort((a,b)=>(a==='אחר')-(b==='אחר'));
+const facById = Object.fromEntries((D.fac || []).map(f => [f.id, f]));
+const ent = id => mkById[id] || facById[id];
+// the topics the player can pick; "אחר" stays reachable through search only
+const topics = [...new Set(D.votes.map(v => v.topic))].filter(t => t !== 'אחר');
 const $ = id => document.getElementById(id);
 let A, B, queue = [], cur = null, asked = [], topicNow = null;
 let tags = {}, revealed = {}, mode = 'for', auto = false;
+let pickKind = 'mk', chosen = [], shown = {};  // shown[topic] = how many of its votes are open (5 at a time)
 let crowd = {}, crowdN = 0, myStored = {};  // shared tallies from every player (db)  // tags: vote id -> the player's own vote 'F' (בעד) | 'A' (נגד) | 'B' (נמנע/ת), set before the reveal
 const TAG = {K:'כסא', M:'מעשה'};
 
@@ -72,7 +76,7 @@ function fit(){
 function options(){
   const g = {};
   D.mks.forEach(m => (g[m.faction] ||= []).push(m));
-  return '<option value="">בחירה...</option>' + Object.entries(g).map(([f,ms]) => `<optgroup label="${f}">${ms.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</optgroup>`).join('');
+  return '<option value="">בחירה...</option>' + `<optgroup label="סיעות">${(D.fac||[]).map(f=>`<option value="${f.id}">${f.name}</option>`).join('')}</optgroup>` + Object.entries(g).map(([f,ms]) => `<optgroup label="${f}">${ms.map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</optgroup>`).join('');
 }
 // MK picker: type a name or a faction (the hidden <select> keeps the value)
 const mkNorm = t => t.replace(/["'׳״\-–.]/g, '').replace(/\s+/g, ' ').trim();
@@ -80,17 +84,25 @@ function mkInput(id){ return `<span class="mkpick"><input class="mkq" id="${id}q
 function mkCombo(id){
   const sel = $(id), inp = $(id + 'q'); let res = $('mkres'), hits = [], at = -1;
   if (!res) { res = document.createElement('ul'); res.id = 'mkres'; res.className = 'mkres'; res.setAttribute('role', 'listbox'); res.hidden = true; document.body.appendChild(res) }
-  const m0 = mkById[sel.value]; inp.value = m0 ? m0.name : '';
+  const m0 = ent(sel.value); inp.value = m0 ? m0.name : '';
   const place = () => { const r = inp.getBoundingClientRect(), vw = innerWidth, vh = window.visualViewport ? visualViewport.height : innerHeight;
     const w = Math.min(vw - 16, Math.max(r.width, 260)), left = Math.max(8, Math.min(r.right - w, vw - w - 8));
     const below = vh - r.bottom - 12, above = r.top - 12, up = below < 200 && above > below;
     res.style.left = left + 'px'; res.style.width = w + 'px'; res.style.maxHeight = Math.min(320, up ? above : below) + 'px';
     res.style.top = up ? '' : (r.bottom + 4) + 'px'; res.style.bottom = up ? (innerHeight - r.top + 4) + 'px' : '' };
-  const draw = all => { const q = all === true ? '' : mkNorm(inp.value);
-    const score = m => { if (!q) return 1; const n = mkNorm(m.name), f = mkNorm(m.faction);
+  const draw = all => { const q = all === true ? '' : mkNorm(inp.value), fac = pickKind === 'fac', pool = fac ? D.fac : D.mks;
+    const item = (m, i) => `<li role="option" data-i="${i}"><b>${m.name}</b><small>${fac ? '' : m.faction}</small></li>`;
+    if (!q) {  // well-known first, coalition and opposition apart
+      const byName = (a, b) => a.name.localeCompare(b.name, 'he'), fam = s => D.mks.filter(m => m.s === s && m.fam !== undefined).sort((a, b) => a.fam - b.fam);
+      const sec = fac ? [['קואליציה', D.fac.filter(f => f.s === 'c')], ['אופוזיציה', D.fac.filter(f => f.s === 'o')]]
+        : [['קואליציה', fam('c')], ['אופוזיציה', fam('o')], ['כל השאר', D.mks.filter(m => m.fam === undefined).sort(byName)]];
+      hits = []; at = -1;
+      res.innerHTML = sec.map(([h, xs]) => `<li class="hdr" role="presentation">${h}</li>` + xs.map(m => item(m, hits.push(m) - 1)).join('')).join('');
+    } else {
+    const score = m => { const n = mkNorm(m.name), f = mkNorm(m.faction || '');
       return n.startsWith(q) ? 4 : (' ' + n).includes(' ' + q) ? 3 : n.includes(q) ? 2 : f.includes(q) ? 1 : 0 };
-    hits = D.mks.map(m => [score(m), m]).filter(x => x[0]).sort((a, b) => b[0] - a[0] || a[1].name.localeCompare(b[1].name, 'he')).map(x => x[1]);
-    at = -1; res.innerHTML = hits.length ? hits.map((m, i) => `<li role="option" data-i="${i}"><b>${m.name}</b><small>${m.faction}</small></li>`).join('') : '<li class="none">לא נמצא</li>';
+    hits = pool.map(m => [score(m), m]).filter(x => x[0]).sort((a, b) => b[0] - a[0] || a[1].name.localeCompare(b[1].name, 'he')).map(x => x[1]);
+    at = -1; res.innerHTML = hits.length ? hits.map(item).join('') : '<li class="none">לא נמצא</li>'; }
     res.dataset.for = id; res.hidden = false; inp.setAttribute('aria-expanded', 'true'); place() };
   const close = () => { if (res.dataset.for === id) { res.hidden = true; inp.setAttribute('aria-expanded', 'false') } };
   const choose = m => { sel.value = m.id; inp.value = m.name; close(); sel.dispatchEvent(new Event('change')); inp.blur() };
@@ -100,7 +112,7 @@ function mkCombo(id){
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); at = (at + (e.key === 'ArrowDown' ? 1 : -1) + li.length) % li.length; li.forEach((x, j) => x.classList.toggle('on', j === at)); li[at]?.scrollIntoView({block: 'nearest'}) }
     else if (e.key === 'Enter') { e.preventDefault(); const m = hits[at < 0 ? 0 : at]; if (m) choose(m) }
     else if (e.key === 'Escape') close() };
-  inp.onblur = () => setTimeout(() => { if (document.activeElement !== inp) { close(); const m = mkById[sel.value]; inp.value = m ? m.name : '' } }, 150);
+  inp.onblur = () => setTimeout(() => { if (document.activeElement !== inp) { close(); const m = ent(sel.value); inp.value = m ? m.name : '' } }, 150);
   // mousedown keeps focus in the input; selecting on click lets a finger scroll the list without picking
   res.addEventListener('mousedown', e => { if (res.dataset.for === id) e.preventDefault() });
   res.addEventListener('click', e => { if (res.dataset.for !== id) return; const li = e.target.closest('li[data-i]'); if (li) choose(hits[+li.dataset.i]) });
@@ -110,18 +122,29 @@ function pickScreen(){
   cur = null; $('game').classList.add('picking'); $('sum').hidden = true; $('pager').innerHTML = '';
   $('match').hidden = $('restart').hidden = $('finish').hidden = true;
   $('qcard').innerHTML = `<div class="qbody pickq"><p class="qtext">את מי מביאים לבמה?</p>
-    <p class="ex">בוחרים שני חברי כנסת ומצביעים על הצעות חוק אמיתיות. אחרי כל הצבעה רואים מה הם הצביעו בפועל במליאה, ובסוף כמה ההצבעות שלך מתאימות לשלהם.</p>
+    <p class="ex">בוחרים שניים ומצביעים על הצעות חוק אמיתיות. אחרי כל הצבעה רואים מה הם הצביעו בפועל, ובסוף כמה ההצבעות שלך מתאימות לשלהם.</p>
+    <div class="kind" role="tablist" aria-label="מה מעלים לבמה">${[['mk','חברי כנסת'],['fac','סיעות']].map(([k,w])=>`<button type="button" role="tab" data-k="${k}" aria-selected="${pickKind===k}">${w}</button>`).join('')}</div>
     <div class="pickrow"><label>מתמודד/ת ראשון/ה${mkInput("selA")}</label><span class="vs">מול</span><label>מתמודד/ת שני/ה${mkInput("selB")}</label></div></div>
     <div class="tagrow"><button class="btn" id="go" disabled>לעלות לבמה</button></div>`;
-  const sync = () => { const a = mkById[$('selA').value], b = mkById[$('selB').value];
+  const sync = () => { const a = ent($('selA').value), b = ent($('selB').value);
     podium('podA', a); podium('podB', b); $('go').disabled = !a || !b || a === b };
-  if (A) $('selA').value = A.id; if (B) $('selB').value = B.id;
+  const DEF = {mk: ['טלי גוטליב', 'נעמה לזימי'].map(n => D.mks.find(m => m.name === n)), fac: [D.fac[0], D.fac.find(f => f.name === 'יש עתיד')]};
+  const put = (k, m) => { $(k).value = m ? m.id : ''; $(k + 'q').value = m ? m.name : '' };
+  if (!A || !B) [A, B] = DEF[pickKind];
+  $('selA').value = A.id; $('selB').value = B.id;
   $('selA').onchange = $('selB').onchange = sync; sync(); mkCombo('selA'); mkCombo('selB');
+  $('qcard').querySelectorAll('.kind [role=tab]').forEach(t => t.onclick = () => {
+    if (pickKind === t.dataset.k) return; pickKind = t.dataset.k;
+    $('qcard').querySelectorAll('.kind [role=tab]').forEach(x => x.setAttribute('aria-selected', String(x === t)));
+    const isFac = m => !!(m && m.fac);
+    ['selA', 'selB'].forEach((k, i) => { if (isFac(ent($(k).value)) !== (pickKind === 'fac')) put(k, DEF[pickKind][i]) });
+    if ($('mkres')) $('mkres').hidden = true; sync() });
   $('go').onclick = () => {
-    A = mkById[$('selA').value]; B = mkById[$('selB').value];
+    A = ent($('selA').value); B = ent($('selB').value);
     if (!A || !B || A === B) return;
-    asked = []; queue = []; cur = null; topicNow = null; tags = {}; revealed = {}; exOpen = null;
-    $('game').classList.remove('picking'); idle(); celebrate();
+    asked = []; queue = []; cur = null; topicNow = null; tags = {}; revealed = {}; exOpen = null; shown = {};
+    chosen = ['משפט ושלטון החוק', 'גיוס ושירות', 'תקציב, מסים וקצבאות'].filter(t => topics.includes(t));
+    $('game').classList.remove('picking'); chooseTopics(); celebrate();
     $('match').innerHTML = `${A.name} <span>מול</span> ${B.name}`; $('match').hidden = $('restart').hidden = $('finish').hidden = false;
   };
 }
@@ -151,14 +174,18 @@ function fitPods(){ document.querySelectorAll('.pimg .nameplate').forEach(np => 
   if (room > 0 && w > room) e.style.setProperty('font-size', (px * room / w).toFixed(1) + 'px', 'important') })) }
 addEventListener('resize', () => requestAnimationFrame(fitPods)); document.fonts?.ready.then(fitPods);
 function podium(id, m){
-  const face = !m ? '?' : FACES[m.id] ? `<img src="${FACES[m.id]}" alt="">` : initials(m.name);
+  const face = !m ? '?' : m.fac ? `<span class="fname">${m.name}</span>` : FACES[m.id] ? `<img src="${FACES[m.id]}" alt="">` : initials(m.name);
   $(id).innerHTML = `<div class="pimg"><div class="face${m?'':' empty'}" aria-hidden="true">${face}</div><img src="${PODIUM}" alt="" width="600" height="763">
-    <div class="nameplate"><div class="pname">${m?m.name:'?'}</div><div class="pfac">${m?m.faction:'&nbsp;'}</div></div><div class="plate" id="plate-${id}">?</div></div>
+    <div class="nameplate"><div class="pname">${m?m.name:'?'}</div><div class="pfac">${m?subLine(m):'&nbsp;'}</div></div><div class="plate" id="plate-${id}">?</div></div>
     <div class="ptally" id="tally-${id}">${tallyHTML(m ? match(m, asked) : null)}</div>`;
   fitPods();
 }
 // match: the bills where both the player and the MK cast a vote (בעד / נגד / נמנע); "didn't take part" and
 // "not in the Knesset yet" are left out. same = how many of those were the same vote.
+const subLine = m => m.fac ? (m.s === 'c' ? 'סיעה בקואליציה' : 'סיעה באופוזיציה') : m.faction;
+// a faction's line: how its members who voted split, e.g. "12 בעד, 2 נגד"
+function facCount(m, v){ if (!m.fac) return ''; const [f, a, b] = (m.n[v.i] || '0-0-0').split('-').map(Number);
+  return [[f,'בעד'],[a,'נגד'],[b,'נמנעו']].filter(x => x[0]).map(([n,w]) => `${n} ${w}`).join(', ') }
 const VOTED = a => a === 'F' || a === 'A' || a === 'B';
 function match(m, ids){ let n = 0, same = 0;
   ids.forEach(id => { const t = tags[id], a = ans(m, byId[id]); if (!VOTED(t) || !VOTED(a)) return; n++; if (t === a) same++ });
@@ -170,11 +197,12 @@ function setPlate(id, a){
   const p = $('plate-'+id); p.className = 'plate'; p.textContent = '?';
   if (!a) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  setTimeout(() => { p.className = 'plate ' + (a==='-'?'X':a) + ' pop'; p.textContent = ANS[a]; setTimeout(()=>p.classList.remove('pop'),350) }, reduce?0:450);
+  const m = id === 'podA' ? A : B;
+  setTimeout(() => { p.className = 'plate ' + (a==='-'?'X':a==='S'?'N':a) + ' pop'; p.textContent = m ? mkWord(m, a) : ANS[a]; setTimeout(()=>p.classList.remove('pop'),350) }, reduce?0:450);
 }
 function chips(){
   $('chips').innerHTML = topics.map(t => {
-    const n = D.votes.filter(v=>v.topic===t).length, done = D.votes.filter(v=>v.topic===t).every(v=>asked.includes(v.id));
+    const n = D.votes.filter(v=>v.topic===t).length, done = topicVotes(t).every(id=>asked.includes(id));
     return `<button class="chip${done?' done':''}" aria-pressed="${t===topicNow}" data-t="${t}">${t}<span class="sr"> (${n})</span></button>`
   }).join('');
   $('chips').querySelectorAll('.chip').forEach(c => c.onclick = () => askTopic(c.dataset.t));
@@ -182,13 +210,29 @@ function chips(){
   if (on) { const box = $('chips'), br = box.getBoundingClientRect(), r = on.getBoundingClientRect();
     box.scrollTo({left: box.scrollLeft + (r.left + r.width/2) - (br.left + br.width/2), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}) }
 }
+function chooseTopics(){
+  cur = null; topicNow = null; chips(); $('pager').innerHTML = ''; setPlate('podA'); setPlate('podB');
+  $('qcard').innerHTML = `<div class="qbody idleq topq"><p class="qtext">על מה מצביעים?</p><p class="ex">בכל נושא 5 הצבעות, ותמיד אפשר להוסיף עוד.</p>
+    <div class="tpick">${topics.map(t => `<button type="button" class="tp" aria-pressed="${chosen.includes(t)}" data-t="${t}">${t}</button>`).join('')}</div></div>
+    <div class="tagrow"><button class="btn" id="tgo">להתחיל</button></div>`;
+  const go = $('tgo'), upd = () => { go.disabled = !chosen.length };
+  $('qcard').querySelectorAll('.tp').forEach(b => b.onclick = () => { const t = b.dataset.t;
+    chosen = chosen.includes(t) ? chosen.filter(x => x !== t) : [...chosen, t].sort((x, y) => topics.indexOf(x) - topics.indexOf(y));
+    b.setAttribute('aria-pressed', String(chosen.includes(t))); upd() });
+  upd(); go.onclick = () => chosen.length && askTopic(chosen[0]);
+}
 function idle(){
   cur = null; topicNow = null; chips();
   $('qcard').innerHTML = `<div class="qbody idleq"><p class="qtext">בחרו נושא או חפשו מה שמעניין אתכם בסרגל למעלה</p><p class="ex">כל תשובה של חברי הכנסת היא הצבעה אמיתית במליאה, עם קישור למקור.</p></div>`; $('pager').innerHTML = '';
   setPlate('podA'); setPlate('podB');
 }
 let list = [], idx = 0;
-function topicVotes(t){ return D.votes.filter(v => v.topic===t).sort((a,b)=>(b.key-a.key)||(!!b.ex-!!a.ex)||b.date.localeCompare(a.date)).map(v=>v.id) }
+// a topic = the picked votes first (v.p), then the rest; 5 are open, "עוד 5" opens the next ones
+function topicAll(t){ return D.votes.filter(v => v.topic===t).sort((a,b)=>((a.p||99)-(b.p||99))||(b.key-a.key)||(!!b.ex-!!a.ex)||b.date.localeCompare(a.date)).map(v=>v.id) }
+function topicVotes(t){ return topicAll(t).slice(0, shown[t] || 5) }
+// the next topic: the player's own picks first, then the rest in bar order
+function nextTopic(){ const left = t => t !== topicNow && !topicVotes(t).every(id => asked.includes(id));
+  return chosen.find(left) || topics.find(left) || null }
 function askTopic(t){
   topicNow = t; list = topicVotes(t);
   idx = Math.max(0, list.findIndex(id=>!asked.includes(id)));
@@ -196,7 +240,8 @@ function askTopic(t){
 }
 function show(id, keepPlates){
   const v = byId[id]; cur = id; if (!asked.includes(id)) asked.push(id);
-  if (topicNow !== v.topic || !list.includes(id)) { topicNow = v.topic; list = topicVotes(v.topic) }
+  { const k = topicAll(v.topic).indexOf(id); if (k >= (shown[v.topic] || 5)) shown[v.topic] = Math.ceil((k + 1) / 5) * 5 }
+  topicNow = v.topic; list = topicVotes(v.topic);
   idx = list.indexOf(id);
   const a = ans(A,v), b = ans(B,v), n = list.length;
   const dots = n > 1 ? `<button class="arr" id="prev" aria-label="ההצבעה הקודמת" ${idx===0?'disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -205,12 +250,18 @@ function show(id, keepPlates){
       <button class="arr" id="nxt" aria-label="ההצבעה הבאה" ${idx===n-1?'disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : '';
   const open = auto || revealed[id], c = crowd[id];
   $('qcard').innerHTML = `${icons(v)}<div class="qbody"><p class="qtext">${v.label}</p>
-    ${v.ex ? `<p class="ex" id="ex">${v.ex}</p><button class="more" id="more" type="button" hidden>${exOpen===id?'פחות':'עוד'}</button>` : ''}</div>
+    ${v.ex ? `${exOpen===id?`<p class="ex" id="ex">${v.ex}</p>`:''}<button class="more" id="more" type="button" aria-expanded="${exOpen===id}">${exOpen===id?'להסתיר':'מה זה אומר?'}</button>` : ''}</div>
     <div class="tagrow${tags[id]?' picked':''}"><span class="tagq sr">${open?'הצבעת:':'לפני שחושפים, איך היית מצביע/ה?'}</span>
       <span class="hand" aria-hidden="true">ואיך את/ה היית מצביע/ה?</span>
-      <span class="tagbtns">${[['F','בעד'],['A','נגד'],['B','נמנע/ת']].map(([k,w]) => `<button class="tagb" data-tag="${k}" aria-pressed="${tags[id]===k}">${w}</button>`).join('')}</span></div>`;
+      <span class="tagbtns">${[['F','בעד'],['A','נגד'],['B','נמנע/ת']].map(([k,w]) => `<button class="tagb" data-tag="${k}" aria-pressed="${tags[id]===k}">${w}</button>`).join('')}</span>
+      ${open && idx === n-1 ? endRow(v.topic) : ''}</div>`;
   $('qcard').closest('.q').classList.toggle('expanded', exOpen===id);
   fit();
+  const er = $('qcard').querySelector('.endrow');
+  if (er) er.onclick = e => { const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.go === 'more') { const k = list.length; shown[topicNow] = k + 5; show(topicAll(topicNow)[k]) }
+    else if (b.dataset.go === 'next') askTopic(b.dataset.t);
+    else $('finish').onclick() };
   const more = $('more');
   if (more) more.onclick = () => { exOpen = exOpen===id ? null : id; show(id, true) };
   const ib = $('qcard').querySelector('.ib');
@@ -221,6 +272,8 @@ function show(id, keepPlates){
   if (open) { if (!keepPlates) { setPlate('podA', a); setPlate('podB', b) } } else { setPlate('podA'); setPlate('podB') }
   chips();
 }
+function endRow(t){ const more = topicAll(t).length > list.length, nt = nextTopic();
+  return `<span class="endrow">${more?'<button type="button" data-go="more">עוד 5 בנושא</button>':''}${nt?`<button type="button" data-go="next" data-t="${nt}">לנושא הבא</button>`:''}<button type="button" class="solid" data-go="sum">לסיכום</button></span>` }
 // free search: in the prototype, word matching over the plain titles + a small list of related words.
 // On the site: semantic search that can only return votes from this list (see spec).
 const REL = {'צבא':'גיוס מילואים צה"ל חיילים','מילואים':'מילואימניקים משרתי','חרדים':'ישיבות תורה גיוס דתי','ילדים':'חינוך בתי ספר הורים קצבאות הילדים','משפחה':'אלימות הורים ילדים','שופטים':'משפט סבירות יועץ נציב בית המשפט','בג"ץ':'סבירות שופטים בית המשפט','יוקר':'מסים מס קצבאות ביטוח דמי הבראה דיור','מחיה':'מסים מס קצבאות ביטוח דיור','כסף':'מס מסים קצבאות שכר תקציב','נשים':'מגדר אלמנות','מחבלים':'טרור פיגוע מחבל','טרור':'מחבל פיגוע','בריאות':'בתי חולים ביטוח בריאות נפשי','פריפריה':'יישובי גבול פריפריה','שבת':'דת רבנים','דת':'רבנים תורה חמץ בתי דין','תקשורת':'שידורים ערוץ','דמוקרטיה':'בחירות כנסת ממשלה יועץ סבירות','חסינות':'ח"כ הליך פלילי','משטרה':'שוטרים משטרה','עבודה':'עובדים מעסיקים אבטלה פנסיה','זקנים':'סיעוד פנסיה','קשישים':'סיעוד פנסיה'};
@@ -291,7 +344,7 @@ function cols(m, vs, mark, cap){
 function allVotes(m){
   const f = fem(m), mine = INIT[m.id] || {};
   const vs = [...D.votes].sort((a,b)=>b.date.localeCompare(a.date));
-  const word = a => a==='F'?'בעד':a==='A'?'נגד':a==='B'?(f?'נמנעה':'נמנע'):a==='-'?(f?'לא הייתה בכנסת':'לא היה בכנסת'):(f?'לא הצביעה':'לא הצביע');
+  const word = a => mkWord(m, a);
   const row = v => { const a = ans(m,v), cls = a==='F'?'F':a==='A'?'A':'N', r = mine[v.bill];
     const tag = r==='ראשי' ? `<span class="sinit">יוזמה ${f?'שלה':'שלו'}</span>` : r ? `<span class="sinit co">${f?'חתומה':'חתום'} על ההצעה</span>` : '';
     return `<li class="svrow"><span class="svb ${cls}">${word(a)}</span><span class="svt"><b>${v.label}</b><small>${v.topic} · ${fmtDate(v.date)}</small></span>${tag}<a href="${voteUrl(v.id)}" target="_blank" rel="noopener" aria-label="תוצאות ההצבעה">${DOC}</a></li>` };
@@ -300,14 +353,15 @@ function allVotes(m){
 }
 function podTop(m, sign, head, board, sub){
   return `<div class="stop">
-      <div class="spod"><div class="sface" aria-hidden="true">${FACES[m.id]?`<img src="${FACES[m.id]}" alt="">`:initials(m.name)}</div><img src="${PODIUM}" alt="" width="600" height="763">
-        <div class="snp"><b>${m.name}</b><small>${m.faction}</small></div><div class="ssign">${sign}</div></div>
+      <div class="spod"><div class="sface" aria-hidden="true">${m.fac?`<span class="fname">${m.name}</span>`:FACES[m.id]?`<img src="${FACES[m.id]}" alt="">`:initials(m.name)}</div><img src="${PODIUM}" alt="" width="600" height="763">
+        <div class="snp"><b>${m.name}</b><small>${subLine(m)}</small></div><div class="ssign">${sign}</div></div>
       <div class="sright">${head?`<p class="shead">${head}</p>`:''}${board}${sub?`<p class="stopics">${sub}</p>`:''}</div>
     </div>`;
 }
 // the player's votes next to the MK's: every bill the player voted on, grey; teal where both voted the same
 const MYW = {F:'בעד', A:'נגד', B:'נמנע/ת'};
-function mkWord(m, a){ const f = fem(m); return a==='F'?'בעד':a==='A'?'נגד':a==='B'?(f?'נמנעה':'נמנע'):a==='-'?(f?'לא הייתה בכנסת':'לא היה בכנסת'):(f?'לא השתתפה':'לא השתתף') }
+function mkWord(m, a){ const f = fem(m); if (m.fac && a==='-') return 'הסיעה עוד לא קמה'; if (a==='S') return 'הסיעה התפצלה';
+  return a==='F'?'בעד':a==='A'?'נגד':a==='B'?(f?'נמנעה':'נמנע'):a==='-'?(f?'לא הייתה בכנסת':'לא היה בכנסת'):(f?'לא השתתפה':'לא השתתף') }
 function card(m){
   const f = fem(m), voted = asked.filter(id=>VOTED(tags[id])), qs = voted.map(id=>byId[id]), c = match(m, voted);
   const pct = c.pct === null ? '—' : c.pct + '%';
@@ -315,9 +369,14 @@ function card(m){
   const big = `<div class="smatch" role="img" aria-label="התאמה ${pct}. ${line}"><b>${pct}</b><span>התאמה</span><small>${line}</small></div>`;
   const topics = [...new Set(qs.map(v=>v.topic))];
   const rows = qs.map(v => { const t = tags[v.id], a = ans(m, v), same = t === a;
-    return `<li class="${same?'same':''}"><a href="${voteUrl(v.id)}" target="_blank" rel="noopener"><span>${v.label}</span><small>את/ה: ${MYW[t]} · ${f?'היא':'הוא'}: ${mkWord(m, a)}</small></a></li>` }).join('');
+    const fc = facCount(m, v);
+    return `<li class="${same?'same':''}"><a href="${voteUrl(v.id)}" target="_blank" rel="noopener"><span>${v.label}</span><small>את/ה: ${MYW[t]} · ${m.fac?'הסיעה':f?'היא':'הוא'}: ${mkWord(m, a)}${fc?` (${fc})`:''}</small></a></li>` }).join('');
+  // match per topic: a topic needs at least 2 shared votes for a percentage
+  const per = topics.map(t => { const c = match(m, voted.filter(id => byId[id].topic === t));
+    return `<li><span class="tt">${t}</span>${c.n >= 2 ? `<span class="tbar"><i style="width:${c.pct}%"></i></span><b>${c.pct}%</b>` : `<span class="tno">אין מספיק הצבעות</span>`}</li>` }).join('');
   return `<div class="cw"><article class="scard" aria-label="כרטיס סיכום: ${m.name}">
-    ${podTop(m, `${qs.length} ${qs.length===1?'הצבעה':'הצבעות'}`, '', big, topics.length?`${topics.length>1?'בנושאים':'בנושא'} שעלה במשחק: <b>${topics.join(', ')}</b>`:'')}
+    ${podTop(m, `${qs.length} ${qs.length===1?'הצבעה':'הצבעות'}`, '', big, '')}
+    ${topics.length > 1 ? `<div class="sblk"><h3>לפי נושאים</h3><ul class="stopic">${per}</ul></div>` : ''}
     ${qs.length?`<div class="sblk"><h3>ההצבעות במשחק הזה <span class="slegend"><span class="lgs"><i></i>הצבעתם אותו דבר</span></span></h3><ul class="smrows">${rows}</ul></div>`:''}
     <div class="sblk"><h3>הצבעות מרכזיות</h3>${cols(m,D.headline.map(id=>byId[id]),false,0)}</div>
     ${allVotes(m)}
@@ -348,7 +407,7 @@ function prerender(root){
 async function shareCard(m, el, btn){
   const p = shots.get(String(m.id)), ready = p && p.blob;
   const fileOf = bl => new File([bl], `kise-o-maase-${m.id}.png`, {type: 'image/png'});
-  const text = `מה ${m.name} הצביע בפועל? כסא או מעשה`;
+  const text = `מה ${m.name} ${fem(m)?'הצביעה':'הצביע'} בפועל? כסא או מעשה`;
   // one tap: the image is ready and the phone can share files
   if (ready && navigator.canShare && navigator.canShare({files: [fileOf(ready)]})) {
     try { await navigator.share({files: [fileOf(ready)], title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
@@ -390,7 +449,7 @@ $('finish').onclick = (stay) => {
   s.innerHTML = `<div class="cards2">${card(A)}${card(B)}</div><div class="cdots" aria-hidden="true"><i class="on"></i><i></i></div>
    <div class="row"><button class="btn ghost dark" id="again">משחק חדש</button><button class="btn ghost dark" id="back">חזרה לבמה</button></div>`;
   fitNames(s); prerender(s);
-  s.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(mkById[b.dataset.share], b.closest('.cw'), b));
+  s.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(ent(b.dataset.share), b.closest('.cw'), b));
   $('again').onclick = () => $('restart').click();
   $('back').onclick = () => { s.hidden = true; scrollTo(0,0) };
   const c2 = s.querySelector('.cards2'), dots = s.querySelectorAll('.cdots i');
