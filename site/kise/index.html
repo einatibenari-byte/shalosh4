@@ -983,6 +983,46 @@ body{touch-action:manipulation}
 .shfig .shone{font-size:var(--fs-s);padding:8px 14px}
 .shimgs .shfig{flex:0 0 auto;width:min(46%,240px);scroll-snap-align:start}.shimgs .shfig .shimgprev{width:100%}
 @media (max-width:560px){.shimgs .shfig{width:70%}}
+/* v49 story pages: measured without the clipping, so overflow shows */
+.smeasure .story .sblk{flex:none;overflow:visible}
+.story .smore{margin:0;text-align:center;font-size:3.6cqi;font-weight:700;color:#2B5E63}
+
+/* v49 (Lior 12.10 sketch): the vote card. i small at the top right; topic and n/5 at the top left; title and "מה זה אומר?"
+   aligned right; a line, then "ההצבעה שלך:" and the buttons in the podium colours; small dots under the card */
+.q .info{top:12px!important;bottom:auto!important;inset-inline-start:14px!important;inset-inline-end:auto!important}
+.q .info .ib{width:20px;height:20px;font-size:11px;border-width:1.2px}
+.q .info .pop{inset-inline-start:0;inset-inline-end:auto}
+.qhead{justify-content:flex-end!important;gap:14px!important;padding-inline-start:34px;font-size:var(--fs-xs)!important;color:#9A9384}
+.qhead .qn{flex:none;letter-spacing:.04em}
+.q .qbody:not(.pickq):not(.idleq){justify-content:flex-start!important;align-items:stretch!important;text-align:start!important}
+.q .qbody:not(.pickq):not(.idleq) .qtext{text-align:start!important;max-width:none!important;margin-inline:0!important;border-bottom:0;padding-bottom:0;font-family:var(--body);font-weight:700;text-wrap:pretty}
+.q .qbody:not(.pickq):not(.idleq) .more{align-self:flex-start!important;margin-top:6px!important;color:var(--navy);text-decoration:none;font-weight:400;font-family:var(--body);padding:0;background:none;border:0}
+.q .qbody:not(.pickq):not(.idleq) .more:hover{text-decoration:underline}
+.tagrow{gap:10px!important}
+.tagrow .hand{display:none!important}
+.qsep{display:block;align-self:stretch;height:0;border-top:1.5px solid #D9D0BF;margin:2px 4% 4px}
+.yourv{font-size:var(--fs-xs);color:#4A4F66}
+.tagrow:has(.endrow) .qsep,.tagrow:has(.endrow) .yourv{display:none}
+.tagbtns{display:flex!important;width:100%;gap:10px!important}
+.tagb,.tagb[data-tag]{flex:1 1 0!important;width:auto!important;max-width:none!important;border-radius:10px!important;font-family:var(--display);font-size:var(--fs-m)!important;padding:9px 6px!important}
+.tagb[data-tag="F"]{background-color:var(--for)!important;color:#fff!important}
+.tagb[data-tag="A"]{background-color:var(--against)!important;color:#fff!important}
+.tagb[data-tag="B"]{background-color:#E6DFD2!important;color:var(--navy)!important}
+.pdots{display:flex;gap:8px;justify-content:center;align-items:center;padding:4px 0}
+.pdots i{width:8px;height:8px;border-radius:50%;background:rgba(27,36,72,.22);cursor:pointer}
+.pdots i.on{background:var(--navy)}
+@media (min-width:761px){.pdots i{width:10px;height:10px}.q .info .ib{width:24px;height:24px;font-size:13px}}
+@media (max-width:760px){.q .arr,.pager .arr{display:none!important}}
+/* the topic bar: no backing, and a soft fade on both ends */
+.toprow{background:none!important;box-shadow:none!important}
+.chips{mask-image:linear-gradient(to right,transparent,#000 8%,#000 90%,transparent)!important;-webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 90%,transparent)!important}
+.pdots{direction:rtl}
+.story .sblk{flex:none!important;overflow:visible!important}
+.story .stop{display:grid!important;grid-template-columns:44% 1fr!important;align-items:center;justify-items:stretch!important;gap:4cqi}
+.story .spod{width:100%!important;margin-top:26%!important}
+.story .sright{display:flex;flex-direction:column;gap:2cqi;align-items:center}
+.story .smatch b{font-size:13cqi!important}
+@media (min-width:761px){.q .qbody:not(.pickq):not(.idleq){max-width:none!important;width:100%!important}}
 </style>
 
 </head>
@@ -1257,13 +1297,13 @@ function show(id, keepPlates){
   topicNow = v.topic; list = topicVotes(v.topic);
   idx = list.indexOf(id);
   const a = ans(A,v), b = ans(B,v), n = list.length;
-  const dots = `${ARR('prev', 'ההצבעה הקודמת', idx===0)}<span class="dotwrap"><span class="pcount" aria-live="polite">${idx+1}/${n}</span></span>${ARR('nxt', 'ההצבעה הבאה', false)}`;
+  const dots = `${ARR('prev', 'ההצבעה הקודמת', idx===0)}<span class="dotwrap"><span class="pdots" aria-hidden="true">${list.map((_, i) => `<i class="${i===idx?'on':''}" data-i="${i}"></i>`).join('')}</span><span class="pcount sr" aria-live="polite">${idx+1}/${n}</span></span>${ARR('nxt', 'ההצבעה הבאה', false)}`;
   const open = auto || revealed[id], c = crowd[id];
-  $('qcard').innerHTML = `${qhead(idx)}<div class="qbody"><p class="qtext">${v.label}${icons(v)}</p>
+  $('qcard').innerHTML = `${qhead(idx, n)}${icons(v)}<div class="qbody"><p class="qtext">${v.label}</p>
     ${v.ex ? `<button class="more" id="more" type="button" aria-expanded="false">מה זה אומר?</button>` : ''}</div>
     <div class="tagrow${tags[id]?' picked':''}"><span class="tagq sr">${open?'הצבעת:':'לפני שחושפים, איך היית מצביע/ה?'}</span>
-      <span class="hand" aria-hidden="true">ואיך את/ה היית מצביע/ה?</span>
-      <span class="tagbtns">${[['F','בעד'],['A','נגד'],['B','נמנע/ת']].map(([k,w]) => `<button class="tagb" data-tag="${k}" aria-pressed="${tags[id]===k}">${w}</button>`).join('')}</span>
+      <span class="qsep" aria-hidden="true"></span><span class="yourv" aria-hidden="true">ההצבעה שלך:</span>
+      <span class="tagbtns">${[['F','בעד'],['A','נגד'],['B','נמנע.ת']].map(([k,w]) => `<button class="tagb" data-tag="${k}" aria-pressed="${tags[id]===k}">${w}</button>`).join('')}</span>
 </div>`;
   $('qcard').closest('.q').classList.remove('expanded');
   const more = $('more');
@@ -1271,13 +1311,14 @@ function show(id, keepPlates){
   const ib = $('qcard').querySelector('.ib');
   ib.onclick = e => { e.stopPropagation(); const o = !ib.parentNode.classList.contains('open'); ib.parentNode.classList.toggle('open', o); ib.setAttribute('aria-expanded', String(o)) };
   $('pager').innerHTML = dots; podTally();
+  $('pager').querySelectorAll('.pdots i').forEach(d => d.onclick = () => show(list[+d.dataset.i]));
   $('prev').onclick = () => idx>0 && show(list[idx-1]); $('nxt').onclick = () => idx<n-1 ? show(list[idx+1]) : endCard();
   $('qcard').querySelectorAll('.tagb').forEach(t => t.onclick = () => { tags[id] = t.dataset.tag; const first = !open; revealed[id] = true; saveTags(); show(id, !first) });
   if (open) { if (!keepPlates) { setPlate('podA', a); setPlate('podB', b) } } else { setPlate('podA'); setPlate('podB') }
   chips();
 }
 // card header: "#n" and the topic, quiet, with a dot per vote of the topic
-function qhead(k){ return `<div class="qhead"><span class="qt">${topicNow}</span></div>` }
+function qhead(k, n){ return `<div class="qhead"><span class="qt">${topicNow}</span>${n ? `<span class="qn">${k + 1}/${n}</span>` : ''}</div>` }
 // the explanation opens over the card, growing upward, so the podiums stay in view
 function openEx(v){
   closeEx(); const q = document.querySelector('.q'), r = q.getBoundingClientRect(), top = $('topnav').getBoundingClientRect().bottom + 8;
@@ -1409,15 +1450,15 @@ function parts(m){
   return {qs, pct, big, top: big + (topics.length > 1 ? `<ul class="stopic">${per}</ul>` : '')};
 }
 // this game's votes split by how the MK / faction voted; teal = the player voted the same
-function gameCols(m, qs, cap){
+function gcolsHTML(m, F, Ag, rest, none = {F: true, A: true}){
   const row = v => { const t = tags[v.id], same = (t==='F'||t==='A') && t === ans(m, v);
     return `<li class="${same?'same':''}"><a href="${voteUrl(v.id)}" target="_blank" rel="noopener"><span>${v.label}</span></a></li>` };
-  const F = qs.filter(v=>ans(m,v)==='F'), Ag = qs.filter(v=>ans(m,v)==='A'), rest = qs.filter(v=>!'FA'.includes(ans(m,v)));
-  const cut = xs => cap ? xs.slice(0, cap) : xs, more = xs => cap && xs.length > cap ? `<li class="more">ועוד ${xs.length - cap}</li>` : '';
-  const col = (cls, h, xs) => `<div class="scol ${cls}"><h4>${h}</h4><ul class="gl">${xs.length ? cut(xs).map(row).join('') + more(xs) : '<li class="none">אין</li>'}</ul></div>`;
+  const col = (cls, h, xs, e) => xs.length || e ? `<div class="scol ${cls}"><h4>${h}</h4><ul class="gl">${xs.length ? xs.map(row).join('') : '<li class="none">אין</li>'}</ul></div>` : '<div></div>';
   const rw = m.fac ? 'הסיעה לא הכריעה' : fem(m) ? 'לא הצביעה בעד או נגד' : 'לא הצביע בעד או נגד';
-  return `<div class="scols gcols">${col('F','בעד',F)}${col('A','נגד',Ag)}</div>${rest.length ? `<div class="grest"><h4>${rw}</h4><ul class="gl">${cut(rest).map(row).join('')}${more(rest)}</ul></div>` : ''}`;
+  return `${F.length || Ag.length || none.F || none.A ? `<div class="scols gcols">${col('F','בעד',F,none.F)}${col('A','נגד',Ag,none.A)}</div>` : ''}${rest.length ? `<div class="grest"><h4>${rw}</h4><ul class="gl">${rest.map(row).join('')}</ul></div>` : ''}`;
 }
+const splitV = (m, vs) => ({F: vs.filter(v=>ans(m,v)==='F'), A: vs.filter(v=>ans(m,v)==='A'), R: vs.filter(v=>!'FA'.includes(ans(m,v)))});
+function gameCols(m, qs){ const s = splitV(m, qs); return gcolsHTML(m, s.F, s.A, s.R) }
 const LEG = '<span class="slegend"><span class="lgs"><i></i>הצבעתם אותו דבר</span></span>';
 function card(m){
   const P = parts(m), qs = P.qs;
@@ -1430,12 +1471,32 @@ function card(m){
     <div class="sfoot"><span>מקור: הצבעות מליאת הכנסת ה־25</span><img src="${LOGO}" alt="כסא או מעשה"></div>
   </article></div>`;
 }
-// two story-size pages (9:16) for sharing: 1) who + match + topics, 2) the votes
+// story-size pages (9:16) for sharing (Lior 12.10): page 1 is the summary card (podium, match, topics, this game's votes);
+// whatever does not fit goes on to page 2 with the key votes, then page 3; at most 3 pages
 function storyPages(m){
   const P = parts(m), foot = `<div class="sfoot"><span>shalosh4.org/kise</span><img src="${LOGO}" alt=""></div>`;
-  return [`<div class="cw story"><article class="scard">${podTop(m, `${P.qs.length} הצבעות`, '', P.top, '')}${foot}</article></div>`,
-    `<div class="cw story"><article class="scard"><div class="stitle"><b>${m.name}</b><span>${P.pct} התאמה</span></div>
-      <div class="sblk"><h3>ההצבעות במשחק הזה ${LEG}</h3>${gameCols(m, P.qs, 7)}</div>${foot}</article></div>`];
+  const qset = new Set(P.qs), secs = [];
+  if (P.qs.length) secs.push({h: `ההצבעות במשחק הזה ${LEG}`, ...splitV(m, P.qs)});
+  secs.push({h: 'הצבעות מרכזיות', ...splitV(m, D.headline.map(id => byId[id]).filter(v => !qset.has(v)))});
+  const q = []; secs.forEach((s, si) => { for (let i = 0; i < Math.max(s.F.length, s.A.length); i++) { if (s.F[i]) q.push([si, 'F', s.F[i]]); if (s.A[i]) q.push([si, 'A', s.A[i]]) }
+    s.R.forEach(v => q.push([si, 'R', v])) });
+  const page = (first, rows, left) => {
+    const blocks = secs.map((s, si) => { const r = rows.filter(x => x[0] === si); if (!r.length) return '';
+      const pick = k => r.filter(x => x[1] === k).map(x => x[2]), cont = q.findIndex(x => x[0] === si) < q.indexOf(r[0]);
+      return `<div class="sblk"><h3>${s.h}</h3>${gcolsHTML(m, pick('F'), pick('A'), pick('R'), {F: !s.F.length && !cont, A: !s.A.length && !cont})}</div>` }).join('');
+    return `<div class="cw story"><article class="scard">${first ? podTop(m, `${P.qs.length} הצבעות`, '', P.top, '') : `<div class="stitle"><b>${m.name}</b><span>${P.pct} התאמה</span></div>`}
+      ${blocks}${left ? `<p class="smore">ועוד ${left} הצבעות באתר</p>` : ''}${foot}</article></div>` };
+  const meas = document.createElement('div'); meas.className = 'smeasure'; meas.style.cssText = 'position:fixed;left:-10000px;top:0;width:540px;direction:rtl;visibility:hidden';
+  document.body.appendChild(meas);
+  const fits = h => { meas.innerHTML = h; fitNames(meas); const c = meas.querySelector('.scard'); return c.scrollHeight <= c.clientHeight + 1 };
+  const pages = []; let k = 0;
+  try { do {
+    const first = !pages.length, last = pages.length === 2, html = n => page(first, q.slice(k, k + n), last && k + n < q.length ? q.length - k - n : 0);
+    let n = 0; while (k + n < q.length && fits(html(n + 1))) n++;
+    if (!n && !first && k < q.length) n = 1;
+    pages.push(html(n)); k += n;
+  } while (k < q.length && pages.length < 3) } finally { meas.remove() }
+  return pages;
 }
 // share = the story card(s) as images: the phone's share sheet when it can take files, otherwise a download,
 // and the images stay on screen so a long press can save them too
@@ -1463,32 +1524,29 @@ async function shareCard(m, btn){
   const p = shots.get(String(m.id)), ready = p && p.blobs;
   const filesOf = bls => bls.map((bl, i) => new File([bl], `kise-o-maase-${i + 1}.png`, {type: 'image/png'}));
   const text = `מה ${m.name} ${fem(m)?'הצביעה':'הצביע'} בפועל? כסא או מעשה`;
-  // one image per share (Lior 12.10): Instagram and most apps take a single picture for a story
+  // one tap: the phone's share sheet with the story images and the link (Lior 12.10: no extra buttons)
+  if (ready && navigator.canShare && navigator.canShare({files: filesOf(ready)})) {
+    try { await navigator.share({files: filesOf(ready), title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
   const old = btn.textContent; btn.disabled = true; btn.textContent = 'מכינים תמונות...';
   let blobs = ready;
   try { blobs ||= (p && await p) || await storyBlobs(m) } catch (e) { blobs = null }
   btn.textContent = old; btn.disabled = false;
   if (!blobs) { btn.textContent = 'לא הצלחנו, אפשר לצלם את המסך'; setTimeout(() => { btn.textContent = old }, 2500); return }
-  const files = filesOf(blobs), canFiles = navigator.canShare && navigator.canShare({files});
-  const u = encodeURIComponent(SITE), t = encodeURIComponent(text);
-  const nets = [['וואטסאפ', `https://wa.me/?text=${t}%20${u}`], ['פייסבוק', `https://www.facebook.com/sharer/sharer.php?u=${u}`],
-    ['X', `https://x.com/intent/post?text=${t}&url=${u}`], ['טלגרם', `https://t.me/share/url?url=${u}&text=${t}`]];
+  const files = filesOf(blobs);
+  if (navigator.canShare && navigator.canShare({files})) { try { await navigator.share({files, title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
+  // no share sheet (a computer): the images, one button to save them
   const ov = document.createElement('div'); ov.className = 'shareov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','שיתוף: '+m.name);
-  ov.innerHTML = `<div class="sharebox"><button class="sclose" aria-label="סגירה">×</button><div class="shimgs">${blobs.map((bl, i) => `<figure class="shfig"><img class="shimgprev" src="${URL.createObjectURL(bl)}" alt="סטורי ${i + 1} מתוך ${blobs.length}: ${m.name}">${canFiles ? `<button class="btn shone" data-i="${i}">לשתף תמונה ${i + 1}</button>` : ''}</figure>`).join('')}</div>
-    <div class="row"><button class="btn ghost dark" id="shdl">לשמור את שתיהן</button></div>
-    <div class="shnets">${nets.map(([n, h]) => `<a href="${h}" target="_blank" rel="noopener">${n}</a>`).join('')}<button type="button" id="shcp">העתקת קישור</button></div>
-    <span class="note" role="status" id="sst">${canFiles ? 'כל תמונה נשלחת לבד, כדי שתעלה כסטורי.' : 'שתי תמונות בגודל סטורי. אפשר לשמור ולהעלות אותן.'}</span></div>`;
+  ov.innerHTML = `<div class="sharebox"><button class="sclose" aria-label="סגירה">×</button><div class="shimgs">${blobs.map((bl, i) => `<figure class="shfig"><img class="shimgprev" src="${URL.createObjectURL(bl)}" alt="סטורי ${i + 1} מתוך ${blobs.length}: ${m.name}"></figure>`).join('')}</div>
+    <div class="row"><button class="btn" id="shdl">לשמור תמונות</button></div><span class="note" role="status" id="sst"></span></div>`;
   document.body.appendChild(ov); const close = () => ov.remove();
   ov.querySelector('.sclose').onclick = close; ov.onclick = e => { if (e.target === ov) close() };
   ov.addEventListener('keydown', e => { if (e.key === 'Escape') close() }); ov.querySelector('.sclose').focus();
   const st = ov.querySelector('#sst');
-  ov.querySelectorAll('.shone').forEach(b => b.onclick = async () => { try { await navigator.share({files: [files[+b.dataset.i]], title: 'כסא או מעשה', text: text + ' ' + SITE}) } catch (e) {} });
   ov.querySelector('#shdl').onclick = async () => { const dl = await dlCap;
     try { for (const file of files) { if (dl) await dl.save({filename: file.name, data: file});
         else { const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); await new Promise(r => setTimeout(r, 400)) } }
       st.textContent = 'נשמר.' }
     catch (e) { st.textContent = 'אפשר ללחוץ לחיצה ארוכה על כל תמונה ולשמור.' } };
-  ov.querySelector('#shcp').onclick = async () => { try { await navigator.clipboard.writeText(SITE); st.textContent = 'הקישור הועתק.' } catch (e) { st.textContent = SITE } };
 }
 // podium names: as big as the sign allows, on one line (in cqi so a shared image keeps the size)
 function fitNames(root){ root.querySelectorAll('.snp').forEach(p => { const b = p.querySelector('b'), sm = p.querySelector('small');

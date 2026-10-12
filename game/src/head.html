@@ -966,4 +966,44 @@ body{touch-action:manipulation}
 .shfig .shone{font-size:var(--fs-s);padding:8px 14px}
 .shimgs .shfig{flex:0 0 auto;width:min(46%,240px);scroll-snap-align:start}.shimgs .shfig .shimgprev{width:100%}
 @media (max-width:560px){.shimgs .shfig{width:70%}}
+/* v49 story pages: measured without the clipping, so overflow shows */
+.smeasure .story .sblk{flex:none;overflow:visible}
+.story .smore{margin:0;text-align:center;font-size:3.6cqi;font-weight:700;color:#2B5E63}
+
+/* v49 (Lior 12.10 sketch): the vote card. i small at the top right; topic and n/5 at the top left; title and "מה זה אומר?"
+   aligned right; a line, then "ההצבעה שלך:" and the buttons in the podium colours; small dots under the card */
+.q .info{top:12px!important;bottom:auto!important;inset-inline-start:14px!important;inset-inline-end:auto!important}
+.q .info .ib{width:20px;height:20px;font-size:11px;border-width:1.2px}
+.q .info .pop{inset-inline-start:0;inset-inline-end:auto}
+.qhead{justify-content:flex-end!important;gap:14px!important;padding-inline-start:34px;font-size:var(--fs-xs)!important;color:#9A9384}
+.qhead .qn{flex:none;letter-spacing:.04em}
+.q .qbody:not(.pickq):not(.idleq){justify-content:flex-start!important;align-items:stretch!important;text-align:start!important}
+.q .qbody:not(.pickq):not(.idleq) .qtext{text-align:start!important;max-width:none!important;margin-inline:0!important;border-bottom:0;padding-bottom:0;font-family:var(--body);font-weight:700;text-wrap:pretty}
+.q .qbody:not(.pickq):not(.idleq) .more{align-self:flex-start!important;margin-top:6px!important;color:var(--navy);text-decoration:none;font-weight:400;font-family:var(--body);padding:0;background:none;border:0}
+.q .qbody:not(.pickq):not(.idleq) .more:hover{text-decoration:underline}
+.tagrow{gap:10px!important}
+.tagrow .hand{display:none!important}
+.qsep{display:block;align-self:stretch;height:0;border-top:1.5px solid #D9D0BF;margin:2px 4% 4px}
+.yourv{font-size:var(--fs-xs);color:#4A4F66}
+.tagrow:has(.endrow) .qsep,.tagrow:has(.endrow) .yourv{display:none}
+.tagbtns{display:flex!important;width:100%;gap:10px!important}
+.tagb,.tagb[data-tag]{flex:1 1 0!important;width:auto!important;max-width:none!important;border-radius:10px!important;font-family:var(--display);font-size:var(--fs-m)!important;padding:9px 6px!important}
+.tagb[data-tag="F"]{background-color:var(--for)!important;color:#fff!important}
+.tagb[data-tag="A"]{background-color:var(--against)!important;color:#fff!important}
+.tagb[data-tag="B"]{background-color:#E6DFD2!important;color:var(--navy)!important}
+.pdots{display:flex;gap:8px;justify-content:center;align-items:center;padding:4px 0}
+.pdots i{width:8px;height:8px;border-radius:50%;background:rgba(27,36,72,.22);cursor:pointer}
+.pdots i.on{background:var(--navy)}
+@media (min-width:761px){.pdots i{width:10px;height:10px}.q .info .ib{width:24px;height:24px;font-size:13px}}
+@media (max-width:760px){.q .arr,.pager .arr{display:none!important}}
+/* the topic bar: no backing, and a soft fade on both ends */
+.toprow{background:none!important;box-shadow:none!important}
+.chips{mask-image:linear-gradient(to right,transparent,#000 8%,#000 90%,transparent)!important;-webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 90%,transparent)!important}
+.pdots{direction:rtl}
+.story .sblk{flex:none!important;overflow:visible!important}
+.story .stop{display:grid!important;grid-template-columns:44% 1fr!important;align-items:center;justify-items:stretch!important;gap:4cqi}
+.story .spod{width:100%!important;margin-top:26%!important}
+.story .sright{display:flex;flex-direction:column;gap:2cqi;align-items:center}
+.story .smatch b{font-size:13cqi!important}
+@media (min-width:761px){.q .qbody:not(.pickq):not(.idleq){max-width:none!important;width:100%!important}}
 </style>
