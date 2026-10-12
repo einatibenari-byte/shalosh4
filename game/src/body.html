@@ -412,13 +412,13 @@ function mkWord(m, a){ const f = fem(m); if (m.fac && a==='-') return 'הסיע�
 function parts(m){
   const f = fem(m), voted = asked.filter(id=>tags[id]==='F'||tags[id]==='A'), qs = asked.filter(id=>revealed[id]).map(id=>byId[id]), c = match(m, voted);
   const pct = c.pct === null ? '—' : c.pct + '%';
-  const line = c.n ? `הצבעת כמו${f?'ה':'הו'} ב־${c.same} מתוך ${c.n}` : voted.length ? `${f?'היא לא הצביעה':'הוא לא הצביע'} בהצעות שהצבעת עליהן` : 'עוד לא הצבעת בעד או נגד';
+  const line = c.n ? `${c.same}/${c.n} הצבעות זהות` : voted.length ? `${f?'היא לא הצביעה':'הוא לא הצביע'} בהצעות שהצבעת עליהן` : 'עוד לא הצבעת בעד או נגד';
   const big = `<div class="smatch" role="img" aria-label="התאמה ${pct}. ${line}"><b>${pct}</b><span>התאמה</span><small>${line}</small></div>`;
   const topics = [...new Set(qs.map(v=>v.topic))];
   // match per topic, right under the big number; a topic needs at least 2 shared votes for a percentage
   const per = topics.map(t => { const c = match(m, voted.filter(id => byId[id].topic === t));
-    return `<li><span class="tt">${t}</span>${c.n >= 2 ? `<span class="tbar"><i style="width:${c.pct}%"></i></span><b>${c.pct}%</b>` : `<span class="tno">אין מספיק הצבעות</span>`}</li>` }).join('');
-  return {qs, pct, big, top: big + (topics.length > 1 ? `<ul class="stopic">${per}</ul>` : '')};
+    return `<li><span class="tt">${t}</span>${c.n >= 2 ? `<span class="tbar"><i style="width:${c.pct}%"></i></span><b>${c.pct}%</b>` : `<span class="tno" aria-label="אין מספיק הצבעות">------</span>`}</li>` }).join('');
+  return {qs, pct, big, top: big, tops: topics.length > 1 ? `<ul class="stopic">${per}</ul>` : ''};
 }
 // this game's votes split by how the MK / faction voted; teal = the player voted the same
 function gcolsHTML(m, F, Ag, rest, none = {F: true, A: true}){
@@ -434,8 +434,7 @@ const LEG = '<span class="slegend"><span class="lgs"><i></i>הצבעתם אות�
 function card(m){
   const P = parts(m), qs = P.qs;
   return `<div class="cw"><article class="scard" aria-label="כרטיס סיכום: ${m.name}">
-    <button class="sharebtn stopbtn" data-share="${m.id}">לשתף</button>
-    ${podTop(m, `${qs.length} ${qs.length===1?'הצבעה':'הצבעות'}`, '', P.top, '')}
+    ${podTop(m, `${qs.length} ${qs.length===1?'הצבעה':'הצבעות'}`, '', P.top + `<button class="sharebtn sinbtn" data-share="${m.id}">לשתף</button>`, '')}${P.tops}
     ${qs.length?`<div class="sblk"><h3>ההצבעות במשחק הזה ${LEG}</h3>${gameCols(m, qs)}</div>`:''}
     <div class="sblk"><h3>הצבעות מרכזיות</h3>${cols(m,D.headline.map(id=>byId[id]),false,0)}</div>
     ${allVotes(m)}
@@ -455,7 +454,7 @@ function storyPages(m){
     const blocks = secs.map((s, si) => { const r = rows.filter(x => x[0] === si); if (!r.length) return '';
       const pick = k => r.filter(x => x[1] === k).map(x => x[2]), cont = q.findIndex(x => x[0] === si) < q.indexOf(r[0]);
       return `<div class="sblk"><h3>${s.h}</h3>${gcolsHTML(m, pick('F'), pick('A'), pick('R'), {F: !s.F.length && !cont, A: !s.A.length && !cont})}</div>` }).join('');
-    return `<div class="cw story"><article class="scard">${first ? podTop(m, `${P.qs.length} הצבעות`, '', P.top, '') : `<div class="stitle"><b>${m.name}</b><span>${P.pct} התאמה</span></div>`}
+    return `<div class="cw story"><article class="scard">${first ? podTop(m, `${P.qs.length} הצבעות`, '', P.top, '') + P.tops : `<div class="stitle"><b>${m.name}</b><span>${P.pct} התאמה</span></div>`}
       ${blocks}${left ? `<p class="smore">ועוד ${left} הצבעות באתר</p>` : ''}${foot}</article></div>` };
   const meas = document.createElement('div'); meas.className = 'smeasure'; meas.style.cssText = 'position:fixed;left:-10000px;top:0;width:540px;direction:rtl;visibility:hidden';
   document.body.appendChild(meas);
