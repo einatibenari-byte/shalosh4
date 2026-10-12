@@ -44,6 +44,12 @@ FAC = [('הליכוד', 'c', ['1096']), ('ש"ס', 'c', ['1095']), ('יהדות �
        ('עוצמה יהודית', 'c', ['1106']), ('הימין הממלכתי', 'c', ['1108']), ('יש עתיד', 'o', ['1102']),
        ('כחול לבן – המחנה הממלכתי', 'o', ['1098', '1110']), ('ישראל ביתנו', 'o', ['1104']), ('העבודה', 'o', ['1100']),
        ('חד"ש-תע"ל', 'o', ['1103']), ('רע"ם', 'o', ['1099'])]
+# the faction head shown in the podium oval (Lior 12.10); PersonIDs. Smotrich is not among the game's MKs, so no photo yet.
+# Labor: Merav Michaeli led the faction until 2024; the party leader since (Yair Golan) is not an MK.
+HEAD = {'הליכוד': (965, 'בנימין נתניהו'), 'ש"ס': (2291, 'אריה דרעי'), 'יהדות התורה': (30846, 'יצחק גולדקנופף'),
+        'הציונות הדתית': (None, 'בצלאל סמוטריץ׳'), 'עוצמה יהודית': (30811, 'איתמר בן גביר'), 'הימין הממלכתי': (1027, 'גדעון סער'),
+        'יש עתיד': (23594, 'יאיר לפיד'), 'כחול לבן – המחנה הממלכתי': (30657, 'בני גנץ'), 'ישראל ביתנו': (427, 'אביגדור ליברמן'),
+        'העבודה': (23565, 'מרב מיכאלי'), 'חד"ש-תע"ל': (30066, 'איימן עודה'), 'רע"ם': (30713, 'מנסור עבאס')}
 spans = collections.defaultdict(list)   # FactionID -> [(PersonID, start, end)]
 for r in csv.DictReader(open(os.path.join(H, 'kns_persontoposition.csv'), encoding='utf-8')):
     if r['KnessetNum'] == '25' and r['FactionID']:
@@ -60,7 +66,8 @@ for k, (name, side, fids) in enumerate(FAC):
         n.append(f"{c['F']}-{c['A']}-{c['B']}")
         top = c.most_common()
         v += 'N' if not top else 'S' if len(top) > 1 and top[0][1] == top[1][1] else top[0][0]
-    D['fac'].append({'id': f'f{k + 1}', 'name': name, 's': side, 'g': 'f', 'fac': True, 'v': v, 'n': n})
+    hid, hn = HEAD[name]
+    D['fac'].append({'id': f'f{k + 1}', 'name': name, 's': side, 'g': 'f', 'fac': True, 'head': hid, 'hn': hn, 'v': v, 'n': n})
 json.dump(D, open(P, 'w'), ensure_ascii=False, separators=(',', ':'))
 print(sum('p' in v for v in D['votes']), 'picked;', len(D['fac']), 'factions;', sum('fam' in m for m in D['mks']), 'well-known MKs')
 for f in D['fac']: print(f['name'], collections.Counter(f['v']))
