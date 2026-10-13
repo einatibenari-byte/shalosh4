@@ -144,7 +144,7 @@ function pickScreen(){ $('game').classList.remove('choosing'); pickKind = 'fac';
   $('match').hidden = $('restart').hidden = $('finish').hidden = true;
   $('qcard').innerHTML = `<div class="qbody pickq"><p class="qtext" id="picktitle">${pickTitle()}</p>
     <div class="kind" role="tablist" aria-label="מה מעלים לבמה">${[['fac','סיעות'],['mk','חברי כנסת']].map(([k,w])=>`<button type="button" role="tab" data-k="${k}" aria-selected="${pickKind===k}">${w}</button>`).join('')}</div>
-    <div class="pickrow"><label><span class="sr">ראשון/ה</span>${mkInput("selA")}</label><span class="vs">מול</span><label><span class="sr">שני/ה</span>${mkInput("selB")}</label></div></div>
+    <div class="pickrow"><label><span class="sr">ראשון/ה</span>${mkInput("selA")}</label><span class="vs">מול</span><label><span class="sr">שני/ה</span>${mkInput("selB")}</label></div><p class="pnote">* נבחרי ציבור שלא כיהנו או הצביעו בכנסת ה־25 לא נכללים ברשימה.</p></div>
     <div class="tagrow"><button class="btn" id="go" disabled>לעלות לבמה</button></div>`;
   const sync = () => { const a = ent($('selA').value), b = ent($('selB').value);
     podium('podA', a); podium('podB', b); $('go').disabled = !a || !b || a === b };
@@ -566,7 +566,8 @@ addEventListener('resize', () => { if (!$('sum').hidden) fitNames($('sum')) });
 $('finish').onclick = (stay) => {
   const s = $('sum'); s.hidden = false;
   s.innerHTML = `<div class="csel"><div class="kind" role="tablist" aria-label="סיכום של">${[A, B].map((m, k) => `<button type="button" role="tab" data-c="${k}" aria-selected="${k===0}">${m.name}</button>`).join('')}</div></div><div class="cards2">${card(A)}${card(B)}</div>
-   <div class="row"><button class="btn ghost dark" id="again">משחק חדש</button><button class="btn ghost dark" id="back">חזרה לבמה</button></div>`;
+   <div class="row"><button class="btn ghost dark" id="again">משחק חדש</button><button class="btn ghost dark" id="back">חזרה לבמה</button></div>
+   <p class="gfoot">"כסא או מעשה" לא ממליץ על מי להצביע. כל הנתונים מהצבעות מליאת הכנסת ה־25.<br>נבנה על ידי <a href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener">@einatbenari</a> · מצאת טעות או רוצה לכתוב לנו? <a href="mailto:einati.ben.ari@gmail.com">einati.ben.ari@gmail.com</a></p>`;
   fitNames(s); prerender(s);
   s.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(ent(b.dataset.share), b));
   $('again').onclick = () => $('restart').click();
