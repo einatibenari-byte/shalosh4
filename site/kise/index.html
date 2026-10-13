@@ -1097,6 +1097,10 @@ body{touch-action:manipulation}
 .pnote{margin:10px 0 0;font-size:12px;line-height:1.35;color:var(--muted);text-align:center}
 .gfoot{margin:22px auto 8px;max-width:640px;padding:0 16px;text-align:center;font-size:13px;line-height:1.6;color:var(--navy);opacity:.85}
 .gfoot a{color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+
+/* v57: terms link on the second intro card */
+.introq ~ .tagrow{flex-direction:column;align-items:center;gap:10px}
+.tlink{font-size:12px;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
 </style>
 
 </head>
@@ -1234,7 +1238,7 @@ function introScreen(pg = 0){
     : `<div class="qbody pickq introq"><p class="qtext">איך זה עובד?</p>
        <p class="ex">בוחרים שתי סיעות או שני חברי כנסת, ורואים איך הצביעו בכנסת ה־25 על הצעות חוק אמיתיות.</p>
        <p class="ex">לפני כל חשיפה מצביעים בעצמכם, ובסוף רואים כמה אתם מתאימים להם. מי שרק רוצה להסתכל לוחץ "נמנע/ת".</p></div>
-       <div class="tagrow"><button class="btn" id="start">שנתחיל?</button></div>`;
+       <div class="tagrow"><button class="btn" id="start">שנתחיל?</button><a class="tlink" href="https://shalosh4.pages.dev/terms/" target="_blank" rel="noopener">לא ממליצים על מי להצביע · תנאי שימוש ופרטיות</a></div>`;
   $('pager').innerHTML = `${ARR('prev', 'הקודם', pg === 0)}<span class="dotwrap"><span class="idots" aria-hidden="true"><i class="${pg===0?'on':''}"></i><i class="${pg===1?'on':''}"></i></span></span>${ARR('nxt', 'הבא', pg === 1)}`;
   $('prev').onclick = () => introScreen(0); $('nxt').onclick = () => introScreen(1);
   if ($('inext')) $('inext').onclick = () => introScreen(1);
