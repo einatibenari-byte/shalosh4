@@ -134,7 +134,7 @@ function introScreen(pg = 0){
        <div class="tagrow"><button class="btn" id="start">שנתחיל?</button></div>`;
   $('pager').innerHTML = `${ARR('prev', 'הקודם', pg === 0)}<span class="dotwrap"><span class="idots" aria-hidden="true"><i class="${pg===0?'on':''}"></i><i class="${pg===1?'on':''}"></i></span></span>${ARR('nxt', 'הבא', pg === 1)}`;
   document.querySelectorAll('.tlink').forEach(x => x.remove());
-  if (pg === 1) document.querySelector('.q').insertAdjacentHTML('beforeend', '<a class="tlink" href="https://shalosh4.pages.dev/terms/" target="_blank" rel="noopener">לא ממליצים על מי להצביע · תנאי שימוש ופרטיות</a>');
+  if (pg === 1) document.querySelector('.q').insertAdjacentHTML('beforeend', '<a class="tlink" href="https://shalosh4.org/terms/" target="_blank" rel="noopener">לא ממליצים על מי להצביע · תנאי שימוש ופרטיות</a>');
   $('prev').onclick = () => introScreen(0); $('nxt').onclick = () => introScreen(1);
   if ($('inext')) $('inext').onclick = () => introScreen(1);
   if ($('start')) $('start').onclick = () => { introPg = null; $('game').classList.remove('intro'); pickScreen() };
@@ -570,7 +570,7 @@ $('finish').onclick = (stay) => {
   const s = $('sum'); s.hidden = false;
   s.innerHTML = `<div class="csel"><div class="kind" role="tablist" aria-label="סיכום של">${[A, B].map((m, k) => `<button type="button" role="tab" data-c="${k}" aria-selected="${k===0}">${m.name}</button>`).join('')}</div></div><div class="cards2">${card(A)}${card(B)}</div>
    <div class="row"><button class="btn ghost dark" id="again">משחק חדש</button><button class="btn ghost dark" id="back">חזרה לבמה</button></div>
-   <p class="gfoot">"כסא או מעשה" לא ממליץ על מי להצביע. כל הנתונים מהצבעות מליאת הכנסת ה־25.<br>נבנה על ידי <a href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener"><bdi dir="ltr">@einatbenari</bdi></a> · מצאת טעות או רוצה לכתוב לנו? <a href="mailto:hello@shalosh4.org">hello@shalosh4.org</a><br><a href="https://shalosh4.pages.dev/terms/" target="_blank" rel="noopener">תנאי שימוש ופרטיות</a> · © שלוש ארבע 2026</p>`;
+   <p class="gfoot">"כסא או מעשה" לא ממליץ על מי להצביע. כל הנתונים מהצבעות מליאת הכנסת ה־25.<br>נבנה על ידי <a href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener"><bdi dir="ltr">@einatbenari</bdi></a> · מצאת טעות או רוצה לכתוב לנו? <a href="mailto:hello@shalosh4.org">hello@shalosh4.org</a><br><a href="https://shalosh4.org/terms/" target="_blank" rel="noopener">תנאי שימוש ופרטיות</a> · © שלוש ארבע 2026</p>`;
   fitNames(s); prerender(s);
   s.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(ent(b.dataset.share), b));
   $('again').onclick = () => $('restart').click();
