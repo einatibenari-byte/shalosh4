@@ -1041,4 +1041,16 @@ body{touch-action:manipulation}
 .stop .smatch{flex:1 1 auto;align-content:center}
 .sinbtn{margin:0 auto!important;align-self:center}
 .spod{overflow:visible}
+/* v54 (Lior 13.10) */
+.introq.i1 .ex{font-weight:500!important;margin:0 0 .5em!important}
+.introq.i1 .ex b{font-weight:700}
+.introq.i1 .ex:last-of-type{margin-bottom:0!important}
+.q .qbody:not(.pickq):not(.idleq) .more{text-decoration:underline!important;text-underline-offset:4px;text-decoration-thickness:1.5px}
+.stopic .tno{white-space:nowrap;font-size:.8em;letter-spacing:0;overflow:hidden;text-overflow:ellipsis}
+.csel{display:none}
+@media (max-width:760px){.csel{display:flex;justify-content:center;position:sticky;top:var(--navh,60px);z-index:5;padding:8px 0 10px}
+  .csel .kind{background:rgba(255,255,255,.7)}.csel .kind [role=tab]{max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cdots{display:none!important}}
+/* faces are framed in the image itself now (eyes 39%, mouth 70%), so no extra zoom */
+.face img,.sface img{transform:none!important;object-fit:cover;object-position:50% 50%!important}
 </style>
