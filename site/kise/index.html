@@ -1670,7 +1670,7 @@ $('finish').onclick = (stay) => {
   const s = $('sum'); s.hidden = false;
   s.innerHTML = `<div class="csel"><div class="kind" role="tablist" aria-label="סיכום של">${[A, B].map((m, k) => `<button type="button" role="tab" data-c="${k}" aria-selected="${k===0}">${m.name}</button>`).join('')}</div></div><div class="cards2">${card(A)}${card(B)}</div>
    <div class="row"><button class="btn ghost dark" id="again">משחק חדש</button><button class="btn ghost dark" id="back">חזרה לבמה</button></div>
-   <p class="gfoot">"כסא או מעשה" לא ממליץ על מי להצביע. כל הנתונים מהצבעות מליאת הכנסת ה־25.<br>נבנה על ידי <a href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener">@einatbenari</a> · מצאת טעות או רוצה לכתוב לנו? <a href="mailto:hello@shalosh4.org">hello@shalosh4.org</a><br><a href="https://shalosh4.pages.dev/terms/" target="_blank" rel="noopener">תנאי שימוש ופרטיות</a> · © שלוש ארבע 2026</p>`;
+   <p class="gfoot">"כסא או מעשה" לא ממליץ על מי להצביע. כל הנתונים מהצבעות מליאת הכנסת ה־25.<br>נבנה על ידי <a href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener"><bdi dir="ltr">@einatbenari</bdi></a> · מצאת טעות או רוצה לכתוב לנו? <a href="mailto:hello@shalosh4.org">hello@shalosh4.org</a><br><a href="https://shalosh4.pages.dev/terms/" target="_blank" rel="noopener">תנאי שימוש ופרטיות</a> · © שלוש ארבע 2026</p>`;
   fitNames(s); prerender(s);
   s.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(ent(b.dataset.share), b));
   $('again').onclick = () => $('restart').click();
