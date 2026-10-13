@@ -446,7 +446,7 @@ function card(m){
 // story-size pages (9:16) for sharing (Lior 12.10): page 1 is the summary card (podium, match, topics, this game's votes);
 // whatever does not fit goes on to page 2 with the key votes, then page 3; at most 3 pages
 function storyPages(m){
-  const P = parts(m), foot = `<div class="sfoot"><span>shalosh4.org/kise</span><img src="${LOGO}" alt=""></div>`;
+  const P = parts(m), foot = `<div class="sfoot"><span>shalosh4.org/kise<small dir="ltr">@einatbenari</small></span><img src="${LOGO}" alt=""></div>`;
   const qset = new Set(P.qs), secs = [];
   if (P.qs.length) secs.push({h: `ההצבעות במשחק הזה ${LEG}`, ...splitV(m, P.qs)});
   secs.push({h: 'הצבעות מרכזיות', ...splitV(m, D.headline.map(id => byId[id]).filter(v => !qset.has(v)))});
@@ -501,7 +501,7 @@ function voteStory(v){
       <div class="snp"><b>${m.name}</b><small>${subLine(m)}</small></div><div class="ssign vsign ${c}">${mkWord(m, a)}</div></div>` };
   return `<div class="cw story vstory"><article class="scard"><div class="vcard"><p class="vtop">${v.topic} · ${fmtDate(v.date)}</p><h2 class="vtitle">${v.label}</h2>
     ${v.ex ? `<div class="vex"><h3>מה זה אומר?</h3><p>${v.ex}</p></div>` : ''}</div><div class="vpods">${pod(A)}${pod(B)}</div>
-    <div class="sfoot"><span>shalosh4.org/kise</span><img src="${LOGO}" alt=""></div></article></div>`;
+    <div class="sfoot"><span>shalosh4.org/kise<small dir="ltr">@einatbenari</small></span><img src="${LOGO}" alt=""></div></article></div>`;
 }
 const vshots = new Map(); let vtimer = 0;
 async function voteBlob(v){
@@ -519,7 +519,7 @@ const getVote = v => { const k = vkey(v); if (!vshots.has(k)) { const p = voteBl
 function preVote(v){ clearTimeout(vtimer); vtimer = setTimeout(() => { if (cur === v.id) getVote(v).catch(() => null) }, 900) }
 async function shareVote(v, btn){
   const p = getVote(v), file = b => [new File([b], 'kise-o-maase-vote.png', {type: 'image/png'})];
-  const text = `${v.label}: איך ${A.name} ו${B.name} הצביעו בפועל? כסא או מעשה`;
+  const text = `${v.label}: איך ${A.name} ו${B.name} הצביעו בפועל? כסא או מעשה (נבנה על ידי @einatbenari)`;
   if (p.blob && navigator.canShare && navigator.canShare({files: file(p.blob)})) {
     try { await navigator.share({files: file(p.blob), title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
   btn.classList.add('busy'); let b = null; try { b = await p } catch (e) {} btn.classList.remove('busy');
@@ -531,7 +531,7 @@ async function shareVote(v, btn){
 async function shareCard(m, btn){
   const p = shots.get(String(m.id)), ready = p && p.blobs;
   const filesOf = bls => bls.map((bl, i) => new File([bl], `kise-o-maase-${i + 1}.png`, {type: 'image/png'}));
-  const text = `מה ${m.name} ${fem(m)?'הצביעה':'הצביע'} בפועל? כסא או מעשה`;
+  const text = `מה ${m.name} ${fem(m)?'הצביעה':'הצביע'} בפועל? כסא או מעשה (נבנה על ידי @einatbenari)`;
   // one tap: the phone's share sheet with the story images and the link (Lior 12.10: no extra buttons)
   if (ready && navigator.canShare && navigator.canShare({files: filesOf(ready)})) {
     try { await navigator.share({files: filesOf(ready), title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
@@ -570,6 +570,7 @@ $('finish').onclick = (stay) => {
   const s = $('sum'); s.hidden = false;
   s.innerHTML = `<div class="csel"><div class="kind" role="tablist" aria-label="סיכום של">${[A, B].map((m, k) => `<button type="button" role="tab" data-c="${k}" aria-selected="${k===0}">${m.name}</button>`).join('')}</div></div><div class="cards2">${card(A)}${card(B)}</div>
    <div class="row"><button class="btn ghost dark" id="again">משחק חדש</button><button class="btn ghost dark" id="back">חזרה לבמה</button></div>
+   <div class="row igrow"><a class="btn igbtn" href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="currentColor"/></svg><span>לעקוב באינסטגרם <bdi dir="ltr">@einatbenari</bdi></span></a></div>
    <p class="gfoot">"כסא או מעשה" לא ממליץ על מי להצביע. כל הנתונים מהצבעות מליאת הכנסת ה־25.<br>נבנה על ידי <a href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener"><bdi dir="ltr">@einatbenari</bdi></a> · מצאת טעות או רוצה לכתוב לנו? <a href="mailto:hello@shalosh4.org">hello@shalosh4.org</a><br><a href="https://shalosh4.org/terms/" target="_blank" rel="noopener">תנאי שימוש ופרטיות</a> · © שלוש ארבע 2026</p>`;
   fitNames(s); prerender(s);
   s.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(ent(b.dataset.share), b));
