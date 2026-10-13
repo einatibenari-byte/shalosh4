@@ -1109,6 +1109,7 @@ body{touch-action:manipulation}
 .igbtn svg{width:22px;height:22px;flex:none}
 .csel .kind{background:#FBF6EE!important;box-shadow:0 2px 8px rgba(27,36,64,.18)}
 #sum > .row{justify-content:center}
+.igi{width:1.05em;height:1.05em;vertical-align:-.17em;margin-inline-end:.25em}
 </style>
 
 </head>
@@ -1561,7 +1562,7 @@ function card(m){
 // story-size pages (9:16) for sharing (Lior 12.10): page 1 is the summary card (podium, match, topics, this game's votes);
 // whatever does not fit goes on to page 2 with the key votes, then page 3; at most 3 pages
 function storyPages(m){
-  const P = parts(m), foot = `<div class="sfoot"><span>shalosh4.org/kise<small dir="ltr">@einatbenari</small></span><img src="${LOGO}" alt=""></div>`;
+  const P = parts(m), foot = `<div class="sfoot"><span>shalosh4.org/kise<small dir="ltr"><svg class="igi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.4" cy="6.6" r="1.4" fill="currentColor"/></svg>@einatbenari</small></span><img src="${LOGO}" alt=""></div>`;
   const qset = new Set(P.qs), secs = [];
   if (P.qs.length) secs.push({h: `ההצבעות במשחק הזה ${LEG}`, ...splitV(m, P.qs)});
   secs.push({h: 'הצבעות מרכזיות', ...splitV(m, D.headline.map(id => byId[id]).filter(v => !qset.has(v)))});
@@ -1616,7 +1617,7 @@ function voteStory(v){
       <div class="snp"><b>${m.name}</b><small>${subLine(m)}</small></div><div class="ssign vsign ${c}">${mkWord(m, a)}</div></div>` };
   return `<div class="cw story vstory"><article class="scard"><div class="vcard"><p class="vtop">${v.topic} · ${fmtDate(v.date)}</p><h2 class="vtitle">${v.label}</h2>
     ${v.ex ? `<div class="vex"><h3>מה זה אומר?</h3><p>${v.ex}</p></div>` : ''}</div><div class="vpods">${pod(A)}${pod(B)}</div>
-    <div class="sfoot"><span>shalosh4.org/kise<small dir="ltr">@einatbenari</small></span><img src="${LOGO}" alt=""></div></article></div>`;
+    <div class="sfoot"><span>shalosh4.org/kise<small dir="ltr"><svg class="igi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.4" cy="6.6" r="1.4" fill="currentColor"/></svg>@einatbenari</small></span><img src="${LOGO}" alt=""></div></article></div>`;
 }
 const vshots = new Map(); let vtimer = 0;
 async function voteBlob(v){
@@ -1686,7 +1687,7 @@ $('finish').onclick = (stay) => {
   s.innerHTML = `<div class="csel"><div class="kind" role="tablist" aria-label="סיכום של">${[A, B].map((m, k) => `<button type="button" role="tab" data-c="${k}" aria-selected="${k===0}">${m.name}</button>`).join('')}</div></div><div class="cards2">${card(A)}${card(B)}</div>
    <div class="row"><button class="btn ghost dark" id="again">משחק חדש</button><button class="btn ghost dark" id="back">חזרה לבמה</button></div>
    <div class="row igrow"><a class="btn igbtn" href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="currentColor"/></svg><span>לעקוב באינסטגרם <bdi dir="ltr">@einatbenari</bdi></span></a></div>
-   <p class="gfoot">"כסא או מעשה" לא ממליץ על מי להצביע. כל הנתונים מהצבעות מליאת הכנסת ה־25.<br>נבנה על ידי <a href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener"><bdi dir="ltr">@einatbenari</bdi></a> · מצאת טעות או רוצה לכתוב לנו? <a href="mailto:hello@shalosh4.org">hello@shalosh4.org</a><br><a href="https://shalosh4.org/terms/" target="_blank" rel="noopener">תנאי שימוש ופרטיות</a> · © שלוש ארבע 2026</p>`;
+   <p class="gfoot">"כסא או מעשה" לא ממליץ על מי להצביע. כל הנתונים מהצבעות מליאת הכנסת ה־25.<br>נבנה על ידי <a href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener"><bdi dir="ltr"><svg class="igi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.4" cy="6.6" r="1.4" fill="currentColor"/></svg>@einatbenari</bdi></a> · מצאת טעות או רוצה לכתוב לנו? <a href="mailto:hello@shalosh4.org">hello@shalosh4.org</a><br><a href="https://shalosh4.org/terms/" target="_blank" rel="noopener">תנאי שימוש ופרטיות</a> · © שלוש ארבע 2026</p>`;
   fitNames(s); prerender(s);
   s.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(ent(b.dataset.share), b));
   $('again').onclick = () => $('restart').click();
