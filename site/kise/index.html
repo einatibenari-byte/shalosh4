@@ -1099,8 +1099,8 @@ body{touch-action:manipulation}
 .gfoot a{color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:2px}
 
 /* v57: terms link on the second intro card */
-.introq ~ .tagrow{flex-direction:column;align-items:center;gap:10px}
-.tlink{font-size:12px;color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.tlink{position:absolute;left:0;right:0;top:calc(100% + 58px);text-align:center;font-size:12px;color:var(--navy);opacity:.75;text-decoration:underline;text-underline-offset:2px}
+@media (min-width:761px){.tlink{top:calc(100% + 76px);font-size:13px}}
 </style>
 
 </head>
@@ -1238,15 +1238,17 @@ function introScreen(pg = 0){
     : `<div class="qbody pickq introq"><p class="qtext">איך זה עובד?</p>
        <p class="ex">בוחרים שתי סיעות או שני חברי כנסת, ורואים איך הצביעו בכנסת ה־25 על הצעות חוק אמיתיות.</p>
        <p class="ex">לפני כל חשיפה מצביעים בעצמכם, ובסוף רואים כמה אתם מתאימים להם. מי שרק רוצה להסתכל לוחץ "נמנע/ת".</p></div>
-       <div class="tagrow"><button class="btn" id="start">שנתחיל?</button><a class="tlink" href="https://shalosh4.pages.dev/terms/" target="_blank" rel="noopener">לא ממליצים על מי להצביע · תנאי שימוש ופרטיות</a></div>`;
+       <div class="tagrow"><button class="btn" id="start">שנתחיל?</button></div>`;
   $('pager').innerHTML = `${ARR('prev', 'הקודם', pg === 0)}<span class="dotwrap"><span class="idots" aria-hidden="true"><i class="${pg===0?'on':''}"></i><i class="${pg===1?'on':''}"></i></span></span>${ARR('nxt', 'הבא', pg === 1)}`;
+  document.querySelectorAll('.tlink').forEach(x => x.remove());
+  if (pg === 1) document.querySelector('.q').insertAdjacentHTML('beforeend', '<a class="tlink" href="https://shalosh4.pages.dev/terms/" target="_blank" rel="noopener">לא ממליצים על מי להצביע · תנאי שימוש ופרטיות</a>');
   $('prev').onclick = () => introScreen(0); $('nxt').onclick = () => introScreen(1);
   if ($('inext')) $('inext').onclick = () => introScreen(1);
   if ($('start')) $('start').onclick = () => { introPg = null; $('game').classList.remove('intro'); pickScreen() };
 }
 const ARR = (id, label, dis) => `<button class="arr" id="${id}" aria-label="${label}" ${dis?'disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${id==='prev'?'M4 12h16M14 6l6 6-6 6':'M20 12H4M10 6l-6 6 6 6'}" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
 const pickTitle = () => pickKind === 'fac' ? 'בחרו שתי סיעות' : 'בחרו שני חברי כנסת';
-function pickScreen(){ $('game').classList.remove('choosing'); pickKind = 'fac'; introPg = null; atEnd = false;
+function pickScreen(){ document.querySelectorAll('.tlink').forEach(x => x.remove()); $('game').classList.remove('choosing'); pickKind = 'fac'; introPg = null; atEnd = false;
   cur = null; $('game').classList.add('picking'); $('sum').hidden = true; $('pager').innerHTML = '';
   $('match').hidden = $('restart').hidden = $('finish').hidden = true;
   $('qcard').innerHTML = `<div class="qbody pickq"><p class="qtext" id="picktitle">${pickTitle()}</p>
