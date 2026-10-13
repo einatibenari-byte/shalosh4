@@ -1247,7 +1247,7 @@ function pickScreen(){ $('game').classList.remove('choosing'); pickKind = 'fac';
   $('match').hidden = $('restart').hidden = $('finish').hidden = true;
   $('qcard').innerHTML = `<div class="qbody pickq"><p class="qtext" id="picktitle">${pickTitle()}</p>
     <div class="kind" role="tablist" aria-label="מה מעלים לבמה">${[['fac','סיעות'],['mk','חברי כנסת']].map(([k,w])=>`<button type="button" role="tab" data-k="${k}" aria-selected="${pickKind===k}">${w}</button>`).join('')}</div>
-    <div class="pickrow"><label><span class="sr">ראשון/ה</span>${mkInput("selA")}</label><span class="vs">מול</span><label><span class="sr">שני/ה</span>${mkInput("selB")}</label></div><p class="pnote">* נבחרי ציבור שלא כיהנו או הצביעו בכנסת ה־25 לא נכללים ברשימה.</p></div>
+    <div class="pickrow"><label><span class="sr">ראשון/ה</span>${mkInput("selA")}</label><span class="vs">מול</span><label><span class="sr">שני/ה</span>${mkInput("selB")}</label></div><p class="pnote">* ההצבעה של סיעה נקבעת לפי הרוב בין חברי הסיעה שהצביעו.<br>* נבחרי ציבור שלא כיהנו או הצביעו בכנסת ה־25 לא נכללים ברשימה.</p></div>
     <div class="tagrow"><button class="btn" id="go" disabled>לעלות לבמה</button></div>`;
   const sync = () => { const a = ent($('selA').value), b = ent($('selB').value);
     podium('podA', a); podium('podB', b); $('go').disabled = !a || !b || a === b };
