@@ -1700,7 +1700,9 @@ if (BACKEND === 'site') {
   let me; try { me = localStorage.getItem(KEY); if (!me) { me = newId(); localStorage.setItem(KEY, me) } } catch (e) { me = newId() }
   const sent = {};
   const pull = async () => { try { const r = await fetch('/api/tally', {cache: 'no-store'}); if (!r.ok) return; const j = await r.json(); dbOn = true; recrowd(j.tally || {}, j.players || 0) } catch (e) {} };
-  saveTags = async () => {
+  // the preview copy (preview.shalosh4.pages.dev) shares the database: it reads the totals but never adds to them
+  const PREVIEW = /^preview\./.test(location.hostname);
+  saveTags = async () => { if (PREVIEW) return;
     const t = {}; for (const k in tags) if (sent[k] !== tags[k]) t[k] = tags[k];
     if (!Object.keys(t).length) return;
     try { const r = await fetch('/api/tags', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({player: me, tags: t}), keepalive: true});
