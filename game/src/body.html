@@ -270,7 +270,7 @@ function show(id, keepPlates){
   const a = ans(A,v), b = ans(B,v), n = list.length;
   const dots = `${ARR('prev', 'ההצבעה הקודמת', idx===0)}<span class="dotwrap"><span class="pdots" aria-hidden="true">${list.map((_, i) => `<i class="${i===idx?'on':''}" data-i="${i}"></i>`).join('')}</span><span class="pcount sr" aria-live="polite">${idx+1}/${n}</span></span>${ARR('nxt', 'ההצבעה הבאה', false)}`;
   const open = auto || revealed[id], c = crowd[id];
-  $('qcard').innerHTML = `${qhead(idx, n)}${icons(v)}<div class="qbody"><p class="qtext">${v.label}</p>
+  $('qcard').innerHTML = `${qhead(idx, n)}${icons(v)}<button class="vsh" type="button" aria-label="לשתף את ההצבעה">${SHI}</button><div class="qbody"><p class="qtext">${v.label}</p>
     ${v.ex ? `<button class="more" id="more" type="button" aria-expanded="false">מה זה אומר?</button>` : ''}</div>
     <div class="tagrow${tags[id]?' picked':''}"><span class="tagq sr">${open?'הצבעת:':'לפני שחושפים, איך היית מצביע/ה?'}</span>
       <span class="qsep" aria-hidden="true"></span><span class="yourv" aria-hidden="true">ההצבעה שלך:</span>
@@ -281,6 +281,7 @@ function show(id, keepPlates){
   if (more) more.onclick = e => { e.stopPropagation(); openEx(v) };
   const ib = $('qcard').querySelector('.ib');
   ib.onclick = e => { e.stopPropagation(); const o = !ib.parentNode.classList.contains('open'); ib.parentNode.classList.toggle('open', o); ib.setAttribute('aria-expanded', String(o)) };
+  const vsh = $('qcard').querySelector('.vsh'); vsh.onclick = e => { e.stopPropagation(); shareVote(v, vsh) }; preVote(v);
   $('pager').innerHTML = dots; podTally();
   $('pager').querySelectorAll('.pdots i').forEach(d => d.onclick = () => show(list[+d.dataset.i]));
   $('prev').onclick = () => idx>0 && show(list[idx-1]); $('nxt').onclick = () => idx<n-1 ? show(list[idx+1]) : endCard();
@@ -489,6 +490,41 @@ function prerender(root){
     const p = new Promise(r => setTimeout(r, 600 + i * 400)).then(() => storyBlobs(ent(id))).then(bl => (p.blobs = bl)).catch(() => null);
     shots.set(id, p) });
 }
+// one vote as a story image (Lior 13.10): the bill, what it means, and the two podiums with how each voted; not the player's vote
+const SHI = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 12v8h14v-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function voteStory(v){
+  const pod = m => { const a = ans(m, v), c = a==='F'?'F':a==='A'?'A':a==='B'?'B':'N';
+    return `<div class="spod"><div class="sface" aria-hidden="true">${faceOf(m)}</div><img src="${PODIUM}" alt="" width="600" height="763">
+      <div class="snp"><b>${m.name}</b><small>${subLine(m)}</small></div><div class="ssign vsign ${c}">${mkWord(m, a)}</div></div>` };
+  return `<div class="cw story vstory"><article class="scard"><div class="vcard"><p class="vtop">${v.topic} · ${fmtDate(v.date)}</p><h2 class="vtitle">${v.label}</h2>
+    ${v.ex ? `<div class="vex"><h3>מה זה אומר?</h3><p>${v.ex}</p></div>` : ''}</div><div class="vpods">${pod(A)}${pod(B)}</div>
+    <div class="sfoot"><span>shalosh4.org/kise</span><img src="${LOGO}" alt=""></div></article></div>`;
+}
+const vshots = new Map(); let vtimer = 0;
+async function voteBlob(v){
+  const lib = await loadH2I();
+  const box = document.createElement('div'); box.style.cssText = 'position:fixed;left:-10000px;top:0;width:540px;direction:rtl';
+  box.innerHTML = voteStory(v); document.body.appendChild(box); fitNames(box);
+  // a long explanation: the text shrinks until the podiums fit on the page
+  const c = box.querySelector('.scard'); for (let k = 1; k > .55 && c.scrollHeight > c.clientHeight + 1; k -= .05) c.style.setProperty('--k', k.toFixed(2));
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  try { return await lib.toBlob(box.firstElementChild, {pixelRatio: 2, backgroundColor: '#80D8CD'}) } finally { box.remove() }
+}
+const vkey = v => `${A.id}|${B.id}|${v.id}`;
+const getVote = v => { const k = vkey(v); if (!vshots.has(k)) { const p = voteBlob(v).then(b => (p.blob = b)); p.catch(() => vshots.delete(k)); vshots.set(k, p) } return vshots.get(k) };
+// drawn in the background a moment after the card opens, so the tap goes straight to the share sheet
+function preVote(v){ clearTimeout(vtimer); vtimer = setTimeout(() => { if (cur === v.id) getVote(v).catch(() => null) }, 900) }
+async function shareVote(v, btn){
+  const p = getVote(v), file = b => [new File([b], 'kise-o-maase-vote.png', {type: 'image/png'})];
+  const text = `${v.label}: איך ${A.name} ו${B.name} הצביעו בפועל? כסא או מעשה`;
+  if (p.blob && navigator.canShare && navigator.canShare({files: file(p.blob)})) {
+    try { await navigator.share({files: file(p.blob), title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
+  btn.classList.add('busy'); let b = null; try { b = await p } catch (e) {} btn.classList.remove('busy');
+  if (!b) return;
+  const files = file(b);
+  if (navigator.canShare && navigator.canShare({files})) { try { await navigator.share({files, title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
+  shareOv([b], files, v.label);
+}
 async function shareCard(m, btn){
   const p = shots.get(String(m.id)), ready = p && p.blobs;
   const filesOf = bls => bls.map((bl, i) => new File([bl], `kise-o-maase-${i + 1}.png`, {type: 'image/png'}));
@@ -503,10 +539,13 @@ async function shareCard(m, btn){
   if (!blobs) { btn.textContent = 'לא הצלחנו, אפשר לצלם את המסך'; setTimeout(() => { btn.textContent = old }, 2500); return }
   const files = filesOf(blobs);
   if (navigator.canShare && navigator.canShare({files})) { try { await navigator.share({files, title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
-  // no share sheet (a computer): the images, one button to save them
-  const ov = document.createElement('div'); ov.className = 'shareov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','שיתוף: '+m.name);
-  ov.innerHTML = `<div class="sharebox"><button class="sclose" aria-label="סגירה">×</button><div class="shimgs">${blobs.map((bl, i) => `<figure class="shfig"><img class="shimgprev" src="${URL.createObjectURL(bl)}" alt="סטורי ${i + 1} מתוך ${blobs.length}: ${m.name}"></figure>`).join('')}</div>
-    <div class="row"><button class="btn" id="shdl">לשמור תמונות</button></div><span class="note" role="status" id="sst"></span></div>`;
+  shareOv(blobs, files, m.name);
+}
+// no share sheet (a computer): the images, one button to save them
+function shareOv(blobs, files, label){
+  const ov = document.createElement('div'); ov.className = 'shareov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','שיתוף: '+label);
+  ov.innerHTML = `<div class="sharebox"><button class="sclose" aria-label="סגירה">×</button><div class="shimgs">${blobs.map((bl, i) => `<figure class="shfig"><img class="shimgprev" src="${URL.createObjectURL(bl)}" alt="סטורי ${i + 1} מתוך ${blobs.length}: ${label}"></figure>`).join('')}</div>
+    <div class="row"><button class="btn" id="shdl">${blobs.length > 1 ? 'לשמור תמונות' : 'לשמור תמונה'}</button></div><span class="note" role="status" id="sst"></span></div>`;
   document.body.appendChild(ov); const close = () => ov.remove();
   ov.querySelector('.sclose').onclick = close; ov.onclick = e => { if (e.target === ov) close() };
   ov.addEventListener('keydown', e => { if (e.key === 'Escape') close() }); ov.querySelector('.sclose').focus();

@@ -1053,4 +1053,24 @@ body{touch-action:manipulation}
   .cdots{display:none!important}}
 /* faces are framed in the image itself now (eyes 39%, mouth 70%), so no extra zoom */
 .face img,.sface img{transform:none!important;object-fit:cover;object-position:50% 50%!important}
+
+/* v55: share one vote (Lior 13.10) */
+.q .vsh{position:absolute;z-index:4;top:8px;inset-inline-start:40px;width:24px;height:24px;padding:0;border:0;background:none;color:#8F8A80;display:grid;place-items:center;cursor:pointer;border-radius:50%}
+.q .vsh svg{width:19px;height:19px}
+.q .vsh:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.q .vsh.busy{opacity:.4;cursor:progress}
+@media (min-width:761px){.q .vsh{inset-inline-start:46px;width:28px;height:28px}.q .vsh svg{width:22px;height:22px}}
+.vstory .scard{gap:0;padding:8cqi 6cqi 4cqi;background:transparent!important;border:0!important;box-shadow:none!important}
+.vstory .vcard{display:flex;flex-direction:column;gap:3.4cqi;background:var(--paper);border:1px solid var(--navy);border-radius:3cqi;padding:6cqi 6cqi 7cqi}
+.vstory .vtop{margin:0;font-size:3.4cqi;font-weight:700;color:#2B5E63}
+.vstory .vtitle{margin:0;font-family:var(--body);font-weight:900;color:var(--navy);font-size:calc(6.6cqi * var(--k,1));line-height:1.18;text-align:start}
+.vstory .vex{text-align:start}
+.vstory .vex h3{margin:0 0 1.2cqi;font-size:calc(3.8cqi * var(--k,1));font-weight:700;color:var(--navy);text-decoration:underline;text-underline-offset:.5cqi}
+.vstory .vex p{margin:0;font-size:calc(4.2cqi * var(--k,1));line-height:1.4;color:var(--navy)}
+.vstory .vpods{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:6cqi;align-items:center;padding:4cqi 2cqi}
+.vstory .spod{width:100%!important;margin-top:24%!important}
+.vstory .snp b{font-size:4.2cqi}
+.vstory .vsign{font-size:4cqi;font-weight:900;background:#8A8F98}
+.vstory .vsign.F{background:var(--for)}.vstory .vsign.A{background:var(--against)}
+.vstory .sfoot{margin-top:0;border-color:rgba(27,36,64,.25)}
 </style>
