@@ -146,7 +146,7 @@ function pickScreen(){ document.querySelectorAll('.tlink').forEach(x => x.remove
   $('match').hidden = $('restart').hidden = $('finish').hidden = true;
   $('qcard').innerHTML = `<div class="qbody pickq"><p class="qtext" id="picktitle">${pickTitle()}</p>
     <div class="kind" role="tablist" aria-label="מה מעלים לבמה">${[['fac','סיעות'],['mk','חברי כנסת']].map(([k,w])=>`<button type="button" role="tab" data-k="${k}" aria-selected="${pickKind===k}">${w}</button>`).join('')}</div>
-    <div class="pickrow"><label><span class="sr">ראשון/ה</span>${mkInput("selA")}</label><span class="vs">מול</span><label><span class="sr">שני/ה</span>${mkInput("selB")}</label></div><p class="pnote">* ההצבעה של סיעה נקבעת לפי הרוב בין חברי הסיעה שהצביעו.<br>* נבחרי ציבור שלא כיהנו או הצביעו בכנסת ה־25 לא נכללים ברשימה.</p></div>
+    <div class="pickrow"><label><span class="sr">ראשון/ה</span>${mkInput("selA")}</label><span class="vs">מול</span><label><span class="sr">שני/ה</span>${mkInput("selB")}</label></div><p class="pnote">* ההצבעה של סיעה נקבעת לפי הרוב בין חברי הסיעה שהצביעו.<br>* נבחרי ציבור שלא כיהנו בכנסת ה־25, או שכיהנו כשרים ולא הצביעו במליאה, לא משתתפים במשחק.</p></div>
     <div class="tagrow"><button class="btn" id="go" disabled>לעלות לבמה</button></div>`;
   const sync = () => { const a = ent($('selA').value), b = ent($('selB').value);
     podium('podA', a); podium('podB', b); $('go').disabled = !a || !b || a === b };
@@ -478,7 +478,7 @@ const loadH2I = () => h2i ||= new Promise((ok, no) => { const s = document.creat
   s.src = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js'; s.onload = () => ok(window.htmlToImage); s.onerror = no; document.head.appendChild(s) });
 // the story images are drawn in the background as soon as the summary opens, so one tap opens the phone's share sheet
 // the shared link: shalosh4.org once the domain is connected, until then the pages.dev address (Lior 13.10: WhatsApp got a dead link)
-const SITE = /(^|\.)shalosh4\.org$/.test(location.hostname) ? 'https://shalosh4.org/kise/' : 'https://shalosh4.pages.dev/kise/', shots = new Map();
+const SITE = /(^|\.)shalosh4\.org$/.test(location.hostname) ? 'https://shalosh4.org/kise/?s=1' : 'https://shalosh4.pages.dev/kise/?s=1', shots = new Map();
 async function renderStory(html){
   const lib = await loadH2I();
   const box = document.createElement('div'); box.style.cssText = 'position:fixed;left:-10000px;top:0;width:540px;direction:rtl';
@@ -521,12 +521,12 @@ async function shareVote(v, btn){
   const p = getVote(v), file = b => [new File([b], 'kise-o-maase-vote.png', {type: 'image/png'})];
   const text = `${v.label}: איך ${A.name} ו${B.name} הצביעו בפועל? כסא או מעשה (נבנה על ידי @einatbenari)`;
   if (p.blob && navigator.canShare && navigator.canShare({files: file(p.blob)})) {
-    try { await navigator.share({files: file(p.blob), title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
+    try { await navigator.share({files: file(p.blob), title: 'כסא או מעשה', text: text + ' ' + SITE}); logShare('vote', 'sheet', v.id); return } catch (e) { if (e.name === 'AbortError') return } }
   btn.classList.add('busy'); let b = null; try { b = await p } catch (e) {} btn.classList.remove('busy');
   if (!b) return;
   const files = file(b);
-  if (navigator.canShare && navigator.canShare({files})) { try { await navigator.share({files, title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
-  shareOv([b], files, v.label);
+  if (navigator.canShare && navigator.canShare({files})) { try { await navigator.share({files, title: 'כסא או מעשה', text: text + ' ' + SITE}); logShare('vote', 'sheet', v.id); return } catch (e) { if (e.name === 'AbortError') return } }
+  shareOv([b], files, v.label, 'vote', v.id);
 }
 async function shareCard(m, btn){
   const p = shots.get(String(m.id)), ready = p && p.blobs;
@@ -534,18 +534,18 @@ async function shareCard(m, btn){
   const text = `מה ${m.name} ${fem(m)?'הצביעה':'הצביע'} בפועל? כסא או מעשה (נבנה על ידי @einatbenari)`;
   // one tap: the phone's share sheet with the story images and the link (Lior 12.10: no extra buttons)
   if (ready && navigator.canShare && navigator.canShare({files: filesOf(ready)})) {
-    try { await navigator.share({files: filesOf(ready), title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
+    try { await navigator.share({files: filesOf(ready), title: 'כסא או מעשה', text: text + ' ' + SITE}); logShare('summary', 'sheet', m.id); return } catch (e) { if (e.name === 'AbortError') return } }
   const old = btn.textContent; btn.disabled = true; btn.textContent = 'מכינים תמונות...';
   let blobs = ready;
   try { blobs ||= (p && await p) || await storyBlobs(m) } catch (e) { blobs = null }
   btn.textContent = old; btn.disabled = false;
   if (!blobs) { btn.textContent = 'לא הצלחנו, אפשר לצלם את המסך'; setTimeout(() => { btn.textContent = old }, 2500); return }
   const files = filesOf(blobs);
-  if (navigator.canShare && navigator.canShare({files})) { try { await navigator.share({files, title: 'כסא או מעשה', text: text + ' ' + SITE}); return } catch (e) { if (e.name === 'AbortError') return } }
-  shareOv(blobs, files, m.name);
+  if (navigator.canShare && navigator.canShare({files})) { try { await navigator.share({files, title: 'כסא או מעשה', text: text + ' ' + SITE}); logShare('summary', 'sheet', m.id); return } catch (e) { if (e.name === 'AbortError') return } }
+  shareOv(blobs, files, m.name, 'summary', m.id);
 }
 // no share sheet (a computer): the images, one button to save them
-function shareOv(blobs, files, label){
+function shareOv(blobs, files, label, kind, target){
   const ov = document.createElement('div'); ov.className = 'shareov'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-label','שיתוף: '+label);
   ov.innerHTML = `<div class="sharebox"><button class="sclose" aria-label="סגירה">×</button><div class="shimgs">${blobs.map((bl, i) => `<figure class="shfig"><img class="shimgprev" src="${URL.createObjectURL(bl)}" alt="סטורי ${i + 1} מתוך ${blobs.length}: ${label}"></figure>`).join('')}</div>
     <div class="row"><button class="btn" id="shdl">${blobs.length > 1 ? 'לשמור תמונות' : 'לשמור תמונה'}</button></div><span class="note" role="status" id="sst"></span></div>`;
@@ -556,7 +556,7 @@ function shareOv(blobs, files, label){
   ov.querySelector('#shdl').onclick = async () => { const dl = await dlCap;
     try { for (const file of files) { if (dl) await dl.save({filename: file.name, data: file});
         else { const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); await new Promise(r => setTimeout(r, 400)) } }
-      st.textContent = 'נשמר.' }
+      st.textContent = 'נשמר.'; logShare(kind, 'download', target) }
     catch (e) { st.textContent = 'אפשר ללחוץ לחיצה ארוכה על כל תמונה ולשמור.' } };
 }
 // podium names: as big as the sign allows, on one line (in cqi so a shared image keeps the size)
@@ -588,7 +588,7 @@ $('finish').onclick = (stay) => {
 const BACKEND = '__BACKEND__';
 let dbOn = false;
 const recrowd = (agg, n) => { crowd = agg; crowdN = n };  // kept for later use; the game shows only the player's own match
-let saveTags = async () => {}, sendReport = async () => false;
+let saveTags = async () => {}, sendReport = async () => false, logShare = () => {};
 if (BACKEND === 'site') {
   const KEY = 'kise-player', newId = () => crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () => (Math.random()*16|0).toString(16));
   let me; try { me = localStorage.getItem(KEY); if (!me) { me = newId(); localStorage.setItem(KEY, me) } } catch (e) { me = newId() }
@@ -601,6 +601,9 @@ if (BACKEND === 'site') {
     if (!Object.keys(t).length) return;
     try { const r = await fetch('/api/tags', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({player: me, tags: t}), keepalive: true});
       if (r.ok) Object.assign(sent, t) } catch (e) { /* offline: keep playing locally */ } };
+  // share counts (Lior 13.10): completed shares, saved images, and visits from a shared link (?s=1); never from the preview copy
+  logShare = (kind, how, target) => { if (PREVIEW) return; try { fetch('/api/share', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({kind, how, target: target == null ? null : String(target)}), keepalive: true}).catch(() => {}) } catch (e) {} };
+  try { if (new URLSearchParams(location.search).get('s')) { logShare('open'); history.replaceState(null, '', location.pathname + location.hash) } } catch (e) {}
   sendReport = async (vote, text) => { try { return (await fetch('/api/report', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({vote, text})})).ok } catch (e) { return false } };
 } else {
   let myRef = null;
