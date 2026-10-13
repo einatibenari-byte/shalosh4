@@ -477,7 +477,8 @@ const dlCap = (async () => { try { return await window.claude?.use?.('downloads'
 const loadH2I = () => h2i ||= new Promise((ok, no) => { const s = document.createElement('script');
   s.src = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js'; s.onload = () => ok(window.htmlToImage); s.onerror = no; document.head.appendChild(s) });
 // the story images are drawn in the background as soon as the summary opens, so one tap opens the phone's share sheet
-const SITE = 'https://shalosh4.org/kise/', shots = new Map();
+// the shared link: shalosh4.org once the domain is connected, until then the pages.dev address (Lior 13.10: WhatsApp got a dead link)
+const SITE = /(^|\.)shalosh4\.org$/.test(location.hostname) ? 'https://shalosh4.org/kise/' : 'https://shalosh4.pages.dev/kise/', shots = new Map();
 async function renderStory(html){
   const lib = await loadH2I();
   const box = document.createElement('div'); box.style.cssText = 'position:fixed;left:-10000px;top:0;width:540px;direction:rtl';
