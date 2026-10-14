@@ -1100,62 +1100,37 @@ span.tlink{text-decoration:none}
 .intro .pods{display:none!important}
 
 
-/* all-factions table at the end of the game (14.10) */
-.fgw{margin-top:20px}
-.fgcard{background:#F8F2E8;border:1.5px solid var(--navy);border-radius:4cqi;padding:4cqi 3.4cqi;box-shadow:0 6px 18px rgba(0,0,0,.08);color:#111}
-@container (min-width:600px){.fgcard{border-radius:22px;padding:24px 26px}}
-.fgtop{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.fgtop h3{margin:0;font:700 clamp(20px,5.4cqi,30px)/1.2 var(--head,var(--body));color:var(--navy)}
-.fgtop .sharebtn{font-size:15px;padding:8px 20px;flex:none}
-.fgsub{margin:4px 0 12px;color:#55586A;font-size:clamp(14px,3.6cqi,17px)}
-.fg{display:grid;gap:6px}
-.fgr{display:grid;grid-template-columns:repeat(var(--c),minmax(0,1fr)) 6px repeat(var(--o),minmax(0,1fr));gap:3px;align-items:center}
-.fgl{grid-column:1/-1;font-size:14px;font-weight:500;line-height:1.3;margin-top:6px;color:#111}
-.fghd .fgl{display:none}
-.fgf{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
-.fgf small{font-size:8.5px;line-height:1.1;text-align:center;color:#333;min-height:2.2em;overflow-wrap:normal}
-.fgface{width:100%;aspect-ratio:1;max-width:46px;border-radius:50%;overflow:hidden;background:#2A2F55;border:1.5px solid var(--navy);display:grid;place-items:center}
+/* all-factions table (14.10, after Lior's "מי הצביע.ה בעד?" image): names on the right, compact cells, sizes in cqi */
+.fgcard{color:#111}
+.fgsub{margin:0 0 3cqi;color:var(--navy);font-size:3.4cqi}
+.fg{display:grid;gap:1.1cqi}
+.fgr{display:grid;grid-template-columns:37% repeat(var(--c),minmax(0,1fr)) 1.6cqi repeat(var(--o),minmax(0,1fr));gap:.5cqi;align-items:center}
+.fgl{font-size:3.1cqi;font-weight:700;line-height:1.15;color:var(--navy);padding-inline-end:1cqi}
+.fgt{font-size:3.9cqi;font-weight:900;color:var(--navy);margin-top:2cqi}
+.fghd{align-items:end;margin-bottom:.6cqi}
+.fgf{display:flex;flex-direction:column;align-items:center;gap:.6cqi;min-width:0}
+.fgf small{font-size:1.7cqi;letter-spacing:-.02em;font-weight:700;line-height:1.1;text-align:center;color:var(--navy);min-height:2.2em}
+.fgface{width:100%;aspect-ratio:1;border-radius:50%;overflow:hidden;background:#2A2F55;border:.3cqi solid var(--navy);display:grid;place-items:center}
 .fgface img{width:100%;height:100%;object-fit:cover}
-.fgface .fname{font-size:7px;color:#fff;text-align:center}
-.fgf.me{justify-content:flex-end;align-self:stretch}
-.fgf.me b{font-size:11px;color:var(--navy);padding-bottom:4px}
-.fc{display:flex;min-width:0;overflow:hidden;align-items:center;justify-content:center;height:26px;border-radius:6px;font-style:normal;font-size:0;font-weight:700;color:#fff;border:1px solid rgba(20,25,58,.55)}
-.fc.F{background:#16A07A}.fc.A{background:#EC6670}.fc.B{background:#9AA3AA}.fc.S{background:repeating-linear-gradient(135deg,#16A07A 0 5px,#EC6670 5px 10px)}
-.fc.N{background:#fff;border-style:dashed}.fc.X{background:transparent;border-color:transparent}
-.fc.me{border-width:2px;border-color:var(--navy)}.fc.me.X{background:#fff;border-style:dashed;border-color:rgba(20,25,58,.4)}
-.fgleg{display:flex;flex-wrap:wrap;gap:6px 14px;margin:14px 0 0;font-size:13px;color:#333}
-.fgleg span{display:inline-flex;align-items:center;gap:5px}.fgleg .fc{width:14px;height:14px;border-radius:4px}
-.fgnote{margin:8px 0 0;font-size:12.5px;color:#666;line-height:1.45}
-@container (min-width:560px){
-  .fgr{grid-template-columns:minmax(0,1.9fr) repeat(var(--c),minmax(0,1fr)) 10px repeat(var(--o),minmax(0,1fr));gap:4px}
-  .fgl{grid-column:auto;margin-top:0;font-size:15px}
-  .fghd .fgl{display:block}
-  .fc{height:34px;font-size:12px}
-  .fgf small{font-size:11px}
-}
+.fgface .fname{font-size:1.4cqi;color:#fff;text-align:center}
+.fc{display:flex;align-items:center;justify-content:center;min-width:0;overflow:hidden;height:6.2cqi;border-radius:1cqi;font-style:normal;font-size:2.15cqi;font-weight:700;color:#fff;border:.25cqi solid var(--navy)}
+.fc.F{background:#16A07A}.fc.A{background:#EC6670}.fc.B{background:#B9C0C5;color:var(--navy);font-size:1.7cqi}.fc.N{background:#9AA3AA;font-size:3cqi}
+.fc.S{background:repeating-linear-gradient(135deg,#16A07A 0 1.2cqi,#EC6670 1.2cqi 2.4cqi)}.fc.X{background:transparent;border-color:transparent}
+.fgnote{margin:3cqi 0 0;font-size:2.6cqi;color:var(--navy);line-height:1.35}
+.fgnote .fc{display:inline-block;width:2.6cqi;height:2.6cqi;vertical-align:middle;border-radius:.6cqi}
+.tilebox .fgl{font-size:max(3.1cqi,12px)}.tilebox .fgt{font-size:max(3.9cqi,14px)}.tilebox .fgnote{font-size:max(2.6cqi,11px)}
 /* the shared image */
-.fstory .fgcard{height:100%;box-sizing:border-box;border:0;border-radius:0;box-shadow:none;background:#80D8CD;display:flex;flex-direction:column;padding:7cqi 4.5cqi 4cqi}
+.fstory .fgcard{height:100%;box-sizing:border-box;border:0;border-radius:0;box-shadow:none;background:#80D8CD;display:flex;flex-direction:column;padding:7cqi 3.5cqi 4cqi}
 .fstory .fsh{margin:0;text-align:center;font:700 9cqi/1.1 var(--head,var(--body));color:var(--navy)}
-.fstory .fgsub{text-align:center;color:var(--navy);font-size:3.4cqi;margin:1.6cqi 0 4cqi}
-.fstory .fgr{grid-template-columns:repeat(var(--c),minmax(0,1fr)) 3cqi repeat(var(--o),minmax(0,1fr));gap:1cqi}
-.fstory .fg{gap:1.3cqi}
-.fstory .fgl{font-size:3cqi;line-height:1.25;font-weight:700;color:var(--navy);margin-top:1.4cqi}
-.fstory .fc{height:6cqi;font-size:2.4cqi;border-radius:1.2cqi}
-.fstory .fgf small{font-size:1.9cqi;font-weight:700;color:var(--navy)}
-.fghd{align-items:start}
-.fstory .fgface{max-width:none}
-.fstory .fgleg{font-size:2.6cqi;margin-top:3cqi;color:var(--navy)}
-.fstory .fgleg .fc{width:2.6cqi;height:2.6cqi}
-.fstory .fgnote{font-size:2.4cqi;color:var(--navy);opacity:.8}
+.fstory .fgsub{text-align:center;font-size:3.4cqi;margin:1.6cqi 0 4cqi}
+.fstory .fgl{font-size:3.1cqi;font-weight:700;line-height:1.15}.fstory .fg{gap:1.2cqi}
+.fstory .fgr{grid-template-columns:37% repeat(var(--c),minmax(0,1fr)) 1.6cqi repeat(var(--o),minmax(0,1fr));gap:.5cqi}
+.fstory .fc{height:6.2cqi;font-size:2.15cqi;border-radius:1cqi}.fstory .fc.B{font-size:1.8cqi}
+.fstory .fgt{font-size:3.9cqi;margin-top:2cqi}
+.fstory .fgf small{font-size:1.7cqi;letter-spacing:-.02em}
+.fstory .fgnote{font-size:2.6cqi;line-height:1.35}
 .fstory .smore{text-align:center;font-size:3cqi;font-weight:700;color:var(--navy);margin:2cqi 0 0}
 .fstory .sfoot{margin-top:auto;border-color:rgba(27,36,64,.25)}
-/* share image 1 (14.10): the podium and the match only, so they get the whole page */
-.story.s1 .scard{justify-content:flex-start}
-.story.s1 .stop{grid-template-columns:1fr!important;justify-items:center!important;gap:3cqi}
-.story.s1 .spod{width:50%!important;margin-top:10%!important}
-.story.s1 .sright{width:70%}
-.story.s1 .smatch b{font-size:15cqi!important}
-.story.s1 .stopic li{font-size:4cqi}
 /* summary windows (Lior 14.10): small previews under the match, each opens on its own */
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:2.6cqi}
 .tile{display:grid;gap:1cqi;align-content:start;text-align:right;background:#fff;border:.35cqi solid var(--navy);border-radius:3cqi;padding:2.4cqi;cursor:pointer;font-family:inherit;color:var(--navy);box-shadow:0 .8cqi 0 rgba(20,25,58,.18);transition:transform .12s}
@@ -1179,5 +1154,27 @@ span.tlink{text-decoration:none}
 .tilehd .sclose{position:static;width:36px;height:36px;border-radius:50%;border:0;background:#fff;font-size:22px;cursor:pointer;color:var(--navy)}
 .tilecard{box-shadow:none!important;border:0!important;background:transparent!important;padding:0!important}
 .tilecard.fgcard{padding:0!important}
+.tilebox:has(.fgcard){background:#80D8CD}
+/* share picker (14.10) */
+.picknote{margin:0;color:var(--navy);font-size:15px;font-weight:500}
+.pickb{display:block;position:relative;padding:0;border:0;background:none;cursor:pointer;width:100%}
+.pick:not(.on) .shimgprev{opacity:.3;filter:grayscale(1)}
+.pickx{position:absolute;top:8px;inset-inline-start:8px;width:28px;height:28px;border-radius:50%;background:var(--navy);display:grid;place-items:center}
+.pickx::after{content:'✓';color:#fff;font-size:16px;font-weight:700}
+.pick:not(.on) .pickx{background:#fff;border:2px solid var(--navy)}.pick:not(.on) .pickx::after{content:'+';color:var(--navy)}
 html.ovlock{overflow:hidden}
+/* share image 1 (14.10): podium, match and topics; as tall as what is on it (Lior) */
+.story.s1{height:auto;max-height:1250px}
+.story.s1 .scard{height:auto;max-height:1250px;justify-content:flex-start}
+.story.s1 .stop{grid-template-columns:1fr!important;justify-items:center!important;gap:3cqi}
+.story.s1 .spod{width:50%!important;margin-top:10%!important}
+.story.s1 .sright{width:70%}
+.story.s1 .smatch b{font-size:15cqi!important}
+.story.s1 .stopic li{font-size:4cqi}
+.story.s1 .sfoot{margin-top:6cqi}
+.shint{display:grid;gap:1cqi;text-align:center;color:var(--navy);padding-bottom:3cqi;border-bottom:.3cqi dotted #CFC3AE}
+.shint b{font-size:6cqi;font-weight:900}.shint span{font-size:3.4cqi}
+.story.s1 .spod{margin-top:9%!important}
+.ssrc{margin:0;text-align:center;font-size:2.8cqi;font-weight:700;color:var(--navy);opacity:.8}
+.story .ssrc{margin-top:auto}.story .ssrc + .sfoot{margin-top:1.4cqi}
 </style>
