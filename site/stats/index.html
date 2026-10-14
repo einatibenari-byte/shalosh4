@@ -104,6 +104,7 @@ function render(s){
   <div class="grid sec">
     <div class="card"><div class="num">${fmt(sh.summary||0)}</div><div class="lbl">שיתופים של כרטיס הסיכום</div></div>
     <div class="card"><div class="num">${fmt(sh.vote||0)}</div><div class="lbl">שיתופים של הצבעה בודדת</div></div>
+    <div class="card"><div class="num">${fmt(sh.factions||0)}</div><div class="lbl">שיתופים של טבלת הסיעות</div></div>
     <div class="card"><div class="num">${fmt(sh.open||0)}</div><div class="lbl">כניסות מקישור ששותף</div></div>
     <div class="card"><div class="num">${fmt(s.reports)}</div><div class="lbl">דיווחי "מצאת טעות?" (${fmt(s.reports_open)} פתוחים)</div></div>
   </div>

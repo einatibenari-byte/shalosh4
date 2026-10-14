@@ -7,7 +7,7 @@
 #   fac[]        factions as players: v = the majority of the members who voted on that day (F/A/B),
 #                'S' tie, 'N' no member voted, '-' the faction did not exist yet; n = "for-against-abstain" counts
 # Faction members by date come from KNS_PersonToPosition; individual votes from KNS_PlenumVoteResult
-# (vote_results_607.json = [vote id, PersonID, result] for the 607 game votes, all MKs, not only the 139 in the game).
+# (vote_results_607.json = [vote id, PersonID, result] for all the game votes (724 since 14.10; the name stayed), all MKs, not only the 139 in the game).
 import csv, json, os, collections
 H = os.path.dirname(os.path.abspath(__file__)); P = os.path.join(H, 'game_data_full.json')
 D = json.load(open(P))

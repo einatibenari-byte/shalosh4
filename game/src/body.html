@@ -443,6 +443,49 @@ function card(m){
     <div class="sfoot"><span>מקור: הצבעות מליאת הכנסת ה־25</span><img src="${LOGO}" alt="כסא או מעשה"></div>
   </article></div>`;
 }
+// all factions on the bills this player went through (Lior 14.10, after the "מי דואג לחברה?" image):
+// coalition on the right, opposition on the left, the player's own vote first on screen (not in the shared image)
+const FSHORT = {f8: 'כחול לבן', f11: 'חד"ש תע"ל'};
+const FW = {F: 'בעד', A: 'נגד', B: 'נמנעה', S: 'התפצלה', N: 'לא השתתפה', '-': 'לא הייתה'};
+function facGrid(vs, me){
+  const fs = [...D.fac.filter(f => f.s === 'c'), ...D.fac.filter(f => f.s !== 'c')], o1 = fs.findIndex(f => f.s !== 'c');
+  // a narrow empty column between coalition and opposition
+  const n = fs.length + (me ? 1 : 0), gap = k => k === o1 ? '<span class="fgap"></span>' : '',
+    cell = (a, k) => `${gap(k)}<i class="fc ${a === '-' ? 'X' : a}" title="${FW[a] || ''}">${a === 'F' || a === 'A' ? FW[a] : ''}</i>`;
+  const head = `<div class="fgr fghd">${me ? '<span class="fgl"></span><span class="fgf me"><b>אני</b></span>' : '<span class="fgl"></span>'}${fs.map((f, k) =>
+    `${gap(k)}<span class="fgf"><span class="fgface">${faceOf(f)}</span><small>${FSHORT[f.id] || f.name}</small></span>`).join('')}</div>`;
+  const rows = vs.map(v => `<div class="fgr"><span class="fgl">${v.label}</span>${me ? (t => `<i class="fc me ${t || 'X'}">${t === 'F' || t === 'A' ? FW[t] : t === 'B' ? 'נמנע/ת' : ''}</i>`)(tags[v.id]) : ''}${fs.map((f, k) => cell(ans(f, v), k)).join('')}</div>`).join('');
+  return `<div class="fg" style="--n:${n};--c:${o1 + (me ? 1 : 0)};--o:${fs.length - o1}">${head}${rows}</div>
+    <p class="fgleg"><span><i class="fc F"></i>בעד</span><span><i class="fc A"></i>נגד</span><span><i class="fc B"></i>נמנעה</span><span><i class="fc S"></i>התפצלה</span><span><i class="fc N"></i>לא השתתפה</span></p>
+    <p class="fgnote">הצבעת סיעה = איך הצביעו רוב חברי הסיעה שהשתתפו בהצבעה. בימין: סיעות הקואליציה, בשמאל: האופוזיציה.</p>`;
+}
+const facVotes = () => asked.filter(id => revealed[id]).map(id => byId[id]);
+function facCard(){
+  const vs = facVotes(); if (!vs.length) return '';
+  return `<div class="cw fgw"><article class="fgcard" aria-label="איך הצביעו כל הסיעות">
+    <div class="fgtop"><h3>איך הצביעו כל הסיעות?</h3><button class="sharebtn" id="fgshare">לשתף</button></div>
+    <p class="fgsub">על ${vs.length === 1 ? 'ההצבעה' : vs.length + ' ההצבעות'} שעברת במשחק הזה</p>${facGrid(vs, true)}</article></div>`;
+}
+// the shared image: 9:16 like the summary stories, without the player's own vote; up to 9 bills
+function facStory(){
+  const vs = facVotes(), k = vs.slice(0, 7), left = vs.length - k.length;
+  return `<div class="cw story fstory"><article class="fgcard"><h2 class="fsh">איך הצביעו הסיעות?</h2>
+    <p class="fgsub">${vs.length === 1 ? 'הצעת חוק אחת' : vs.length + ' הצעות חוק'} מהכנסת ה־25 שבדקתי בכסא או מעשה</p>
+    ${facGrid(k, false)}${left ? `<p class="smore">ועוד ${left} הצבעות באתר</p>` : ''}
+    <div class="sfoot"><span>shalosh4.org/kise<small dir="ltr"><svg class="igi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.4" cy="6.6" r="1.4" fill="currentColor"/></svg>@einatbenari</small></span><img src="${LOGO}" alt=""></div></article></div>`;
+}
+let fshot = null;
+async function shareFac(btn){
+  const file = b => [new File([b], 'kise-o-maase-factions.png', {type: 'image/png'})], text = `איך הצביעו כל הסיעות? כסא או מעשה (נבנה על ידי @einatbenari)`;
+  if (fshot?.blob && navigator.canShare && navigator.canShare({files: file(fshot.blob)})) {
+    try { await navigator.share({files: file(fshot.blob), title: 'כסא או מעשה', text: text + ' ' + SITE}); logShare('factions', 'sheet'); return } catch (e) { if (e.name === 'AbortError') return } }
+  const old = btn.textContent; btn.disabled = true; btn.textContent = 'מכינים תמונה...';
+  let b = null; try { b = await (fshot ||= renderStory(facStory())) } catch (e) { fshot = null }
+  btn.textContent = old; btn.disabled = false; if (!b) return;
+  const files = file(b);
+  if (navigator.canShare && navigator.canShare({files})) { try { await navigator.share({files, title: 'כסא או מעשה', text: text + ' ' + SITE}); logShare('factions', 'sheet'); return } catch (e) { if (e.name === 'AbortError') return } }
+  shareOv([b], files, 'איך הצביעו כל הסיעות', 'factions', null);
+}
 // story-size pages (9:16) for sharing (Lior 12.10): page 1 is the summary card (podium, match, topics, this game's votes);
 // whatever does not fit goes on to page 2 with the key votes, then page 3; at most 3 pages
 function storyPages(m){
@@ -568,11 +611,13 @@ function fitNames(root){ root.querySelectorAll('.snp').forEach(p => { const b = 
 addEventListener('resize', () => { if (!$('sum').hidden) fitNames($('sum')) });
 $('finish').onclick = (stay) => {
   const s = $('sum'); s.hidden = false;
-  s.innerHTML = `<div class="csel"><div class="kind" role="tablist" aria-label="סיכום של">${[A, B].map((m, k) => `<button type="button" role="tab" data-c="${k}" aria-selected="${k===0}">${m.name}</button>`).join('')}</div></div><div class="cards2">${card(A)}${card(B)}</div>
+  s.innerHTML = `<div class="csel"><div class="kind" role="tablist" aria-label="סיכום של">${[A, B].map((m, k) => `<button type="button" role="tab" data-c="${k}" aria-selected="${k===0}">${m.name}</button>`).join('')}</div></div><div class="cards2">${card(A)}${card(B)}</div>${facCard()}
    <div class="row"><button class="btn ghost dark" id="again">משחק חדש</button><button class="btn ghost dark" id="back">חזרה לבמה</button></div>
    <div class="row igrow"><a class="btn igbtn" href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="currentColor"/></svg><span>לעקוב באינסטגרם <bdi dir="ltr">@einatbenari</bdi></span></a></div>
    <p class="gfoot">"כסא או מעשה" לא ממליץ על מי להצביע. כל הנתונים מהצבעות מליאת הכנסת ה־25.<br>נבנה על ידי <a href="https://www.instagram.com/einatbenari/" target="_blank" rel="noopener"><bdi dir="ltr"><svg class="igi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.4" cy="6.6" r="1.4" fill="currentColor"/></svg>@einatbenari</bdi></a> · מצאת טעות או רוצה לכתוב לנו? <a href="mailto:hello@shalosh4.org">hello@shalosh4.org</a><br><a href="https://shalosh4.org/terms/" target="_blank" rel="noopener">תנאי שימוש ופרטיות</a> · © שלוש ארבע 2026</p>`;
   fitNames(s); prerender(s);
+  fshot = null; if ($('fgshare')) { $('fgshare').onclick = () => shareFac($('fgshare'));
+    setTimeout(() => { const p = renderStory(facStory()).then(b => (p.blob = b)); p.catch(() => { fshot = null }); fshot = p }, 1800) }
   s.querySelectorAll('[data-share]').forEach(b => b.onclick = () => shareCard(ent(b.dataset.share), b));
   $('again').onclick = () => $('restart').click();
   $('back').onclick = () => { s.hidden = true; scrollTo(0,0) };
