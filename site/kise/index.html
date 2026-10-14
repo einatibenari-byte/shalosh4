@@ -1166,6 +1166,13 @@ span.tlink{text-decoration:none}
 .fstory .fgnote{font-size:2.4cqi;color:var(--navy);opacity:.8}
 .fstory .smore{text-align:center;font-size:3cqi;font-weight:700;color:var(--navy);margin:2cqi 0 0}
 .fstory .sfoot{margin-top:auto;border-color:rgba(27,36,64,.25)}
+/* share image 1 (14.10): the podium and the match only, so they get the whole page */
+.story.s1 .scard{justify-content:flex-start}
+.story.s1 .stop{grid-template-columns:1fr!important;justify-items:center!important;gap:3cqi}
+.story.s1 .spod{width:50%!important;margin-top:10%!important}
+.story.s1 .sright{width:70%}
+.story.s1 .smatch b{font-size:15cqi!important}
+.story.s1 .stopic li{font-size:4cqi}
 </style>
 
 </head>
@@ -1658,31 +1665,30 @@ async function shareFac(btn){
   if (navigator.canShare && navigator.canShare({files})) { try { await navigator.share({files, title: 'כסא או מעשה', text: text + ' ' + SITE}); logShare('factions', 'sheet'); return } catch (e) { if (e.name === 'AbortError') return } }
   shareOv([b], files, 'איך הצביעו כל הסיעות', 'factions', null);
 }
-// story-size pages (9:16) for sharing (Lior 12.10): page 1 is the summary card (podium, match, topics, this game's votes);
-// whatever does not fit goes on to page 2 with the key votes, then page 3; at most 3 pages
+// story-size pages (9:16) for sharing. Lior 14.10: four fixed images instead of filling pages:
+// 1 the podium with the match and the per-topic bars, 2 this game's votes, 3 the key votes, 4 the all-factions table
+const IGFOOT = `<div class="sfoot"><span>shalosh4.org/kise<small dir="ltr"><svg class="igi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.4" cy="6.6" r="1.4" fill="currentColor"/></svg>@einatbenari</small></span><img src="${LOGO}" alt=""></div>`;
 function storyPages(m){
-  const P = parts(m), foot = `<div class="sfoot"><span>shalosh4.org/kise<small dir="ltr"><svg class="igi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.4" cy="6.6" r="1.4" fill="currentColor"/></svg>@einatbenari</small></span><img src="${LOGO}" alt=""></div>`;
-  const qset = new Set(P.qs), secs = [];
-  if (P.qs.length) secs.push({h: `ההצבעות במשחק הזה ${LEG}`, ...splitV(m, P.qs)});
-  secs.push({h: 'הצבעות מרכזיות', ...splitV(m, D.headline.map(id => byId[id]).filter(v => !qset.has(v)))});
-  const q = []; secs.forEach((s, si) => { for (let i = 0; i < Math.max(s.F.length, s.A.length); i++) { if (s.F[i]) q.push([si, 'F', s.F[i]]); if (s.A[i]) q.push([si, 'A', s.A[i]]) }
-    s.R.forEach(v => q.push([si, 'R', v])) });
-  const page = (first, rows, left) => {
-    const blocks = secs.map((s, si) => { const r = rows.filter(x => x[0] === si); if (!r.length) return '';
-      const pick = k => r.filter(x => x[1] === k).map(x => x[2]), cont = q.findIndex(x => x[0] === si) < q.indexOf(r[0]);
-      return `<div class="sblk"><h3>${s.h}</h3>${gcolsHTML(m, pick('F'), pick('A'), pick('R'), {F: !s.F.length && !cont, A: !s.A.length && !cont})}</div>` }).join('');
-    return `<div class="cw story"><article class="scard">${first ? podTop(m, `${P.qs.length} הצבעות`, '', P.top, '') + P.tops : `<div class="stitle"><b>${m.name}</b><span>${P.pct} התאמה</span></div>`}
-      ${blocks}${left ? `<p class="smore">ועוד ${left} הצבעות באתר</p>` : ''}${foot}</article></div>` };
+  const P = parts(m), pages = [];
+  pages.push(`<div class="cw story s1"><article class="scard">${podTop(m, `${P.qs.length} הצבעות`, '', P.top, '')}${P.tops}${IGFOOT}</article></div>`);
   const meas = document.createElement('div'); meas.className = 'smeasure'; meas.style.cssText = 'position:fixed;left:-10000px;top:0;width:540px;direction:rtl;visibility:hidden';
   document.body.appendChild(meas);
   const fits = h => { meas.innerHTML = h; fitNames(meas); const c = meas.querySelector('.scard'); return c.scrollHeight <= c.clientHeight + 1 };
-  const pages = []; let k = 0;
-  try { do {
-    const first = !pages.length, last = pages.length === 2, html = n => page(first, q.slice(k, k + n), last && k + n < q.length ? q.length - k - n : 0);
-    let n = 0; while (k + n < q.length && fits(html(n + 1))) n++;
-    if (!n && !first && k < q.length) n = 1;
-    pages.push(html(n)); k += n;
-  } while (k < q.length && pages.length < 3) } finally { meas.remove() }
+  // one list per page: as many bills as fit, the rest counted in "ועוד N הצבעות באתר"
+  const listPage = (h, vs) => { const s = splitV(m, vs), q = [];
+    for (let i = 0; i < Math.max(s.F.length, s.A.length); i++) { if (s.F[i]) q.push(['F', s.F[i]]); if (s.A[i]) q.push(['A', s.A[i]]) }
+    s.R.forEach(v => q.push(['R', v]));
+    const html = n => { const r = q.slice(0, n), pick = k => r.filter(x => x[0] === k).map(x => x[1]);
+      return `<div class="cw story"><article class="scard"><div class="stitle"><b>${m.name}</b><span>${P.pct} התאמה</span></div>
+        <div class="sblk"><h3>${h}</h3>${gcolsHTML(m, pick('F'), pick('A'), pick('R'), {F: !s.F.length, A: !s.A.length})}</div>
+        ${q.length > n ? `<p class="smore">ועוד ${q.length - n} הצבעות באתר</p>` : ''}${IGFOOT}</article></div>` };
+    let n = 0; while (n < q.length && fits(html(n + 1))) n++;
+    return html(Math.max(n, 1)) };
+  try {
+    if (P.qs.length) pages.push(listPage(`ההצבעות במשחק הזה ${LEG}`, P.qs));
+    pages.push(listPage('הצבעות מרכזיות', D.headline.map(id => byId[id])));
+  } finally { meas.remove() }
+  if (facVotes().length) pages.push(facStory());
   return pages;
 }
 // share = the story card(s) as images: the phone's share sheet when it can take files, otherwise a download,
@@ -1698,6 +1704,13 @@ async function renderStory(html){
   const lib = await loadH2I();
   const box = document.createElement('div'); box.style.cssText = 'position:fixed;left:-10000px;top:0;width:540px;direction:rtl';
   box.innerHTML = html; document.body.appendChild(box); fitNames(box);
+  // image 1 with many topics: the podium shrinks until the topic list and the footer fit
+  const c = box.querySelector('.s1 .scard'), pod = c && c.querySelector('.spod');
+  const over = () => c && c.scrollHeight > c.clientHeight + 1;
+  for (let w = 50; over() && w > 38; w -= 4) { pod.style.setProperty('width', w - 4 + '%', 'important'); fitNames(box) }
+  // then the topics without enough votes for a percentage drop out, then the list gets smaller
+  if (over()) c.querySelectorAll('.stopic li').forEach(li => { if (li.querySelector('.tno')) li.remove() });
+  for (let k = 4; over() && k > 2.6; k -= .2) c.querySelectorAll('.stopic li').forEach(li => li.style.fontSize = (k - .2).toFixed(1) + 'cqi');
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   try { return await lib.toBlob(box.firstElementChild, {pixelRatio: 2, backgroundColor: '#80D8CD'}) } finally { box.remove() }
 }
