@@ -486,7 +486,12 @@ async function sharePage(m, k, btn){
 // coalition on the right, opposition on the left, the player's own vote first on screen (not in the shared image)
 const FSHORT = {f8: 'כחול לבן', f11: 'חד"ש תע"ל'};
 const FW = {F: 'בעד', A: 'נגד', B: 'נמנעה', S: 'התפצלה', N: 'לא השתתפה', '-': 'לא הייתה'};
-function facGrid(vs){
+// the shared image has colours only in the cells (too small for words on a phone, Lior 14.10), so it gets a legend on top
+function facLegend(vs){
+  const u = new Set(vs.flatMap(v => D.fac.map(f => ans(f, v))));
+  return `<div class="fleg"><span><i class="fc F"></i>בעד</span><span><i class="fc A"></i>נגד</span>${u.has('B') ? '<span><i class="fc B"></i>נמנעה</span>' : ''}${u.has('N') ? '<span><i class="fc N"></i>לא השתתפה</span>' : ''}${u.has('S') ? '<span><i class="fc S"></i>התפצלה</span>' : ''}</div>`;
+}
+function facGrid(vs, story){
   // a faction that was not in the Knesset for any of these bills gets no column
   const fs = [...D.fac.filter(f => f.s === 'c'), ...D.fac.filter(f => f.s !== 'c')].filter(f => vs.some(v => ans(f, v) !== '-')), o1 = fs.findIndex(f => f.s !== 'c');
   const gap = k => k === o1 ? '<span class="fgap"></span>' : '', W = {F: 'בעד', A: 'נגד', B: 'נמנעה', S: '', N: '–', '-': ''};
@@ -499,7 +504,7 @@ function facGrid(vs){
     `<div class="fgr"><span class="fgl">${v.label}</span>${fs.map((f, k) => cell(ans(f, v), k)).join('')}</div>`).join('')).join('');
   const used = new Set(vs.flatMap(v => fs.map(f => ans(f, v))));
   return `<div class="fg" style="--c:${o1};--o:${fs.length - o1}">${head}${rows}</div>
-    <p class="fgnote">הצבעת סיעה = איך הצביעו רוב חברי הסיעה שהשתתפו בהצבעה. מימין הקואליציה, משמאל האופוזיציה.${used.has('N') ? '<br>– = הסיעה לא השתתפה בהצבעה' : ''}${used.has('S') ? '<br><i class="fc S"></i> = הסיעה התפצלה (מספר שווה בעד ונגד)' : ''}</p>`;
+    <p class="fgnote">${story ? 'מימין הקואליציה, משמאל האופוזיציה. הצבעת סיעה = איך הצביעו רוב חבריה.' : 'הצבעת סיעה = איך הצביעו רוב חברי הסיעה שהשתתפו בהצבעה. מימין הקואליציה, משמאל האופוזיציה.'}${used.has('N') ? '<br>– = הסיעה לא השתתפה בהצבעה' : ''}${used.has('S') ? '<br><i class="fc S"></i> = הסיעה התפצלה (מספר שווה בעד ונגד)' : ''}</p>`;
 }
 const facVotes = () => asked.filter(id => revealed[id]).map(id => byId[id]);
 // the shared image: 9:16 like the summary stories, without the player's own vote; up to 9 bills
@@ -507,7 +512,7 @@ function facStory(max = 10){
   const vs = facVotes(), k = vs.slice(0, max), left = vs.length - k.length;
   return `<div class="cw story fstory"><article class="fgcard">${SKICK}<h2 class="fsh">איך הצביעו הסיעות?</h2>
     <p class="fgsub">${k.length === 1 ? 'הצעת חוק אחת' : k.length + ' הצעות חוק'} מהכנסת ה־25, ואיך הצביעה כל סיעה</p>
-    ${facGrid(k)}${left ? `<p class="smore">ועוד ${left} הצבעות באתר</p>` : ''}
+    ${facLegend(k)}${facGrid(k, true)}${left ? `<p class="smore">ועוד ${left} הצבעות באתר</p>` : ''}
     <p class="ssrc">נתוני הצבעה אמיתיים ממליאת הכנסת ה־25</p><div class="sfoot"><span>shalosh4.org/kise<small dir="ltr"><svg class="igi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.4" cy="6.6" r="1.4" fill="currentColor"/></svg>@einatbenari</small></span><img src="${LOGO}" alt=""></div></article></div>`;
 }
 // the text that goes with a shared image (Lior 14.10: say what this is)
