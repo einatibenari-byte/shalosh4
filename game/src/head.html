@@ -1156,4 +1156,28 @@ span.tlink{text-decoration:none}
 .story.s1 .sright{width:70%}
 .story.s1 .smatch b{font-size:15cqi!important}
 .story.s1 .stopic li{font-size:4cqi}
+/* summary windows (Lior 14.10): small previews under the match, each opens on its own */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:2.6cqi}
+.tile{display:grid;gap:1cqi;align-content:start;text-align:right;background:#fff;border:.35cqi solid var(--navy);border-radius:3cqi;padding:2.4cqi;cursor:pointer;font-family:inherit;color:var(--navy);box-shadow:0 .8cqi 0 rgba(20,25,58,.18);transition:transform .12s}
+.tile:hover,.tile:focus-visible{transform:translateY(-.4cqi)}
+.tile b{font-size:3.5cqi;line-height:1.2}
+.tile small{font-size:2.8cqi;color:#5E6170}
+.tile b::after{content:' ›'}
+.tprev{display:block;height:13cqi;background:#F4EBDC;border-radius:2cqi;padding:1.6cqi;overflow:hidden;margin-bottom:.6cqi}
+.tdots{display:flex;flex-wrap:wrap;gap:.9cqi}
+.td{display:block;width:3.4cqi;height:3.4cqi;border-radius:.8cqi;background:#C9CDD1}
+.td.F{background:#16A07A}.td.A{background:#EC6670}.td.N{background:#fff;border:.25cqi dashed #9AA3AA}
+.td.same{outline:.5cqi solid #4FC7C0;outline-offset:.2cqi}
+.tgrid{display:grid;gap:1cqi}.tgrid .tr{display:grid;grid-template-columns:repeat(12,1fr);gap:.5cqi}.tgrid .td{width:auto;height:2.6cqi;border-radius:.5cqi}
+.tlist{display:grid;gap:1.4cqi;padding-top:.6cqi}.tlist i{display:block;height:2.4cqi;border-radius:1cqi;background:linear-gradient(90deg,#E2D6C2 0 70%,#16A07A 70% 84%,transparent 84%)}
+.tlist i:nth-child(2){background:linear-gradient(90deg,#E2D6C2 0 60%,#EC6670 60% 74%,transparent 74%)}
+.tileov{position:fixed;inset:0;z-index:60;background:rgba(20,25,58,.55);display:flex;justify-content:center;align-items:flex-start;overflow-y:auto;padding:16px}
+.tilebox{width:min(720px,100%);background:#F8F2E8;border-radius:18px;padding:14px 14px 18px;margin:auto 0;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.tilehd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tilehd h2{flex:1;margin:0;font-size:20px;line-height:1.2;color:var(--navy)}
+.tilehd .sharebtn{font-size:15px;padding:8px 18px}
+.tilehd .sclose{position:static;width:36px;height:36px;border-radius:50%;border:0;background:#fff;font-size:22px;cursor:pointer;color:var(--navy)}
+.tilecard{box-shadow:none!important;border:0!important;background:transparent!important;padding:0!important}
+.tilecard.fgcard{padding:0!important}
+html.ovlock{overflow:hidden}
 </style>
