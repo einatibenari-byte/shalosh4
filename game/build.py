@@ -45,3 +45,8 @@ out = ROOT / 'site/kise/index.html'
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(page)
 print(out.relative_to(ROOT), round(len(page.encode()) / 1e6, 2), 'MB')
+
+# the private stats page (/stats/) names bills by their game label
+labels = {v['id']: v['label'] for v in data['votes']}
+(ROOT / 'site/stats').mkdir(parents=True, exist_ok=True)
+(ROOT / 'site/stats/labels.js').write_text('const LABELS = ' + json.dumps(labels, ensure_ascii=False, separators=(',', ':')) + ';\n')
