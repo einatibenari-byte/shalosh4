@@ -1121,17 +1121,32 @@ span.tlink{text-decoration:none}
 .tilebox .fgl{font-size:max(3.1cqi,12px)}.tilebox .fgt{font-size:max(3.9cqi,14px)}.tilebox .fgnote{font-size:max(2.6cqi,11px)}
 .skick{margin:0 0 1cqi;text-align:center;font-size:3.6cqi;font-weight:900;color:var(--navy);padding-bottom:2cqi;border-bottom:.3cqi dotted rgba(27,36,64,.3)}
 .fstory .skick{margin-bottom:2cqi}
+/* all votes without playing (15.10) */
+.vlink{display:block;margin:2.2em auto 0;background:none;border:0;color:var(--navy);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.tilebox.vbox{background:#80D8CD}.vsub{margin:0 0 10px;color:var(--navy);font-size:14px}
+.vctl{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.vctl input,.vctl select{box-sizing:border-box;font:inherit;font-size:16px;padding:8px 10px;border:2px solid var(--navy);border-radius:10px;background:#fff;color:var(--navy);min-width:0}
+.vctl input{flex:1 1 100%}.vctl select{flex:1 1 40%}
+.vlist.fstory .fgl{font-size:max(3.6cqi,13px)}.vlist.fstory .fgr{grid-template-columns:40% repeat(var(--n),minmax(0,1fr));gap:3px}
+.vlist.fstory .vwithmk .fgr{grid-template-columns:12% 30% repeat(var(--n),minmax(0,1fr))}
+.vlist.fstory .fg .fc{height:max(6cqi,22px)}.vlist.fstory .fgf small{font-size:11px;font-weight:700;letter-spacing:0}
+.vhd{position:sticky;top:-1px;background:#80D8CD;z-index:1;padding:6px 0}
+.vmkh{font-size:max(2.6cqi,11px);font-weight:800;color:var(--navy);align-self:end;text-align:center}
+.vmk{font-size:max(2.6cqi,11px);text-align:center;border-radius:8px;padding:4px 2px;color:#fff;background:#9AA3AA}.vmk.F{background:#16A07A}.vmk.A{background:#EC6670}.vmk.B{background:#B9C0C5;color:var(--navy)}.vmk.X{background:transparent;color:var(--navy)}
+.vrow .fgr{cursor:pointer;padding:3px 0}.vrow{border-bottom:1px dotted rgba(27,36,64,.25)}
+.vex2{padding:4px 0 10px;color:var(--navy);font-size:14px}.vex2 p{margin:4px 0 0}
+.vmore{display:block;margin:14px auto}.vnone{text-align:center;color:var(--navy)}
+.fleg.fleg2{display:flex;justify-content:flex-start;gap:2.4cqi;margin:0 0 .8cqi;font-size:inherit;font-weight:700}.fleg.fleg2 .fc{width:2.6cqi!important;height:2.6cqi!important;border-radius:.6cqi}
 /* the shared image */
 .fstory .fgcard{height:100%;box-sizing:border-box;border:0;border-radius:0;box-shadow:none;background:#80D8CD;display:flex;flex-direction:column;padding:5cqi 3.5cqi 4cqi}
-.fstory .fsh{margin:0;text-align:center;font:700 8cqi/1.1 var(--head,var(--body));color:var(--navy)}
-.fstory .fgsub{text-align:center;font-size:4cqi;margin:1cqi 0 2.4cqi}
+.fstory .fsh{margin:0;text-align:center;font:700 6cqi/1.1 var(--head,var(--body));color:var(--navy)}
+.fstory .fgsub{text-align:center;font-size:3.4cqi;margin:1cqi 0 2.4cqi}
 .fstory .fgl{font-size:4cqi;font-weight:700;line-height:1.12}.fstory .fg{gap:1.2cqi}
 .fstory .fgr{grid-template-columns:50% repeat(var(--n),minmax(0,1fr));gap:.5cqi}
 .fstory .fg .fc{height:8cqi;color:transparent;border-radius:1.2cqi}
-.fstory .fgt{font-size:5.2cqi;margin-top:2.6cqi}
+.fstory .fgt{font-size:3.6cqi;margin-top:2cqi}
 .fstory .fgf small{writing-mode:vertical-rl;transform:rotate(180deg);font-size:2.7cqi;font-weight:700;white-space:nowrap;min-height:0;text-align:start;line-height:1}
 .fstory .fgf{flex-direction:column-reverse;gap:1.2cqi}
-.fstory .fgnote{font-size:3.2cqi;line-height:1.35}
+.fstory .fgnote{font-size:2.8cqi;line-height:1.35}
 .fleg{display:flex;justify-content:center;flex-wrap:wrap;gap:1.4cqi 3cqi;margin:0 0 1.6cqi;font-size:4cqi;font-weight:800;color:var(--navy)}
 .fleg span{display:flex;align-items:center;gap:1.2cqi}.fleg .fc{display:inline-block;width:5.5cqi;height:5.5cqi;flex:none}
 .fstory .smore{text-align:center;font-size:4cqi;font-weight:700;color:var(--navy);margin:2cqi 0 0}

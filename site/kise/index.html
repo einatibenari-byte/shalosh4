@@ -1138,17 +1138,32 @@ span.tlink{text-decoration:none}
 .tilebox .fgl{font-size:max(3.1cqi,12px)}.tilebox .fgt{font-size:max(3.9cqi,14px)}.tilebox .fgnote{font-size:max(2.6cqi,11px)}
 .skick{margin:0 0 1cqi;text-align:center;font-size:3.6cqi;font-weight:900;color:var(--navy);padding-bottom:2cqi;border-bottom:.3cqi dotted rgba(27,36,64,.3)}
 .fstory .skick{margin-bottom:2cqi}
+/* all votes without playing (15.10) */
+.vlink{display:block;margin:2.2em auto 0;background:none;border:0;color:var(--navy);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.tilebox.vbox{background:#80D8CD}.vsub{margin:0 0 10px;color:var(--navy);font-size:14px}
+.vctl{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.vctl input,.vctl select{box-sizing:border-box;font:inherit;font-size:16px;padding:8px 10px;border:2px solid var(--navy);border-radius:10px;background:#fff;color:var(--navy);min-width:0}
+.vctl input{flex:1 1 100%}.vctl select{flex:1 1 40%}
+.vlist.fstory .fgl{font-size:max(3.6cqi,13px)}.vlist.fstory .fgr{grid-template-columns:40% repeat(var(--n),minmax(0,1fr));gap:3px}
+.vlist.fstory .vwithmk .fgr{grid-template-columns:12% 30% repeat(var(--n),minmax(0,1fr))}
+.vlist.fstory .fg .fc{height:max(6cqi,22px)}.vlist.fstory .fgf small{font-size:11px;font-weight:700;letter-spacing:0}
+.vhd{position:sticky;top:-1px;background:#80D8CD;z-index:1;padding:6px 0}
+.vmkh{font-size:max(2.6cqi,11px);font-weight:800;color:var(--navy);align-self:end;text-align:center}
+.vmk{font-size:max(2.6cqi,11px);text-align:center;border-radius:8px;padding:4px 2px;color:#fff;background:#9AA3AA}.vmk.F{background:#16A07A}.vmk.A{background:#EC6670}.vmk.B{background:#B9C0C5;color:var(--navy)}.vmk.X{background:transparent;color:var(--navy)}
+.vrow .fgr{cursor:pointer;padding:3px 0}.vrow{border-bottom:1px dotted rgba(27,36,64,.25)}
+.vex2{padding:4px 0 10px;color:var(--navy);font-size:14px}.vex2 p{margin:4px 0 0}
+.vmore{display:block;margin:14px auto}.vnone{text-align:center;color:var(--navy)}
+.fleg.fleg2{display:flex;justify-content:flex-start;gap:2.4cqi;margin:0 0 .8cqi;font-size:inherit;font-weight:700}.fleg.fleg2 .fc{width:2.6cqi!important;height:2.6cqi!important;border-radius:.6cqi}
 /* the shared image */
 .fstory .fgcard{height:100%;box-sizing:border-box;border:0;border-radius:0;box-shadow:none;background:#80D8CD;display:flex;flex-direction:column;padding:5cqi 3.5cqi 4cqi}
-.fstory .fsh{margin:0;text-align:center;font:700 8cqi/1.1 var(--head,var(--body));color:var(--navy)}
-.fstory .fgsub{text-align:center;font-size:4cqi;margin:1cqi 0 2.4cqi}
+.fstory .fsh{margin:0;text-align:center;font:700 6cqi/1.1 var(--head,var(--body));color:var(--navy)}
+.fstory .fgsub{text-align:center;font-size:3.4cqi;margin:1cqi 0 2.4cqi}
 .fstory .fgl{font-size:4cqi;font-weight:700;line-height:1.12}.fstory .fg{gap:1.2cqi}
 .fstory .fgr{grid-template-columns:50% repeat(var(--n),minmax(0,1fr));gap:.5cqi}
 .fstory .fg .fc{height:8cqi;color:transparent;border-radius:1.2cqi}
-.fstory .fgt{font-size:5.2cqi;margin-top:2.6cqi}
+.fstory .fgt{font-size:3.6cqi;margin-top:2cqi}
 .fstory .fgf small{writing-mode:vertical-rl;transform:rotate(180deg);font-size:2.7cqi;font-weight:700;white-space:nowrap;min-height:0;text-align:start;line-height:1}
 .fstory .fgf{flex-direction:column-reverse;gap:1.2cqi}
-.fstory .fgnote{font-size:3.2cqi;line-height:1.35}
+.fstory .fgnote{font-size:2.8cqi;line-height:1.35}
 .fleg{display:flex;justify-content:center;flex-wrap:wrap;gap:1.4cqi 3cqi;margin:0 0 1.6cqi;font-size:4cqi;font-weight:800;color:var(--navy)}
 .fleg span{display:flex;align-items:center;gap:1.2cqi}.fleg .fc{display:inline-block;width:5.5cqi;height:5.5cqi;flex:none}
 .fstory .smore{text-align:center;font-size:4cqi;font-weight:700;color:var(--navy);margin:2cqi 0 0}
@@ -1209,7 +1224,7 @@ html.ovlock{overflow:hidden}
   <div class="match" id="match" hidden></div>
   <div class="navbtns"><button class="navb" id="restart" hidden>להחליף</button><button class="navb solid" id="finish" hidden>לסיכום</button>
     <span class="menuwrap"><button class="menub" id="menub" aria-label="תפריט" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
-    <span class="menu" id="menu" hidden><button id="m-search">חיפוש הצעה</button><button id="m-new">משחק חדש</button></span></span></div>
+    <span class="menu" id="menu" hidden><button id="m-search">חיפוש הצעה</button><button id="m-new">משחק חדש</button><button id="m-all">כל ההצבעות</button></span></span></div>
 </nav>
 
 
@@ -1336,12 +1351,13 @@ function introScreen(pg = 0){
     : `<div class="qbody pickq introq"><p class="qtext">איך זה עובד?</p>
        <p class="ex">בוחרים שתי סיעות או שני חברי כנסת, ורואים איך הצביעו בכנסת ה־25 על הצעות חוק אמיתיות.</p>
        <p class="ex">לפני כל חשיפה מצביעים בעצמכם, ובסוף רואים כמה אתם מתאימים להם. מי שרק רוצה להסתכל לוחץ "נמנע/ת".</p></div>
-       <div class="tagrow"><button class="btn" id="start">שנתחיל?</button></div>`;
+       <div class="tagrow"><button class="btn" id="start">שנתחיל?</button></div><button class="vlink" id="iall">או רק לראות את כל ההצבעות, בלי לשחק</button>`;
   $('pager').innerHTML = `${ARR('prev', 'הקודם', pg === 0)}<span class="dotwrap"><span class="idots" aria-hidden="true"><i class="${pg===0?'on':''}"></i><i class="${pg===1?'on':''}"></i></span></span>${ARR('nxt', 'הבא', pg === 1)}`;
   document.querySelectorAll('.tlink').forEach(x => x.remove());
   if (pg === 1) $('qcard').insertAdjacentHTML('beforeend', '<span class="tlink"><a href="https://shalosh4.org/terms/#votes" target="_blank" rel="noopener">איך נבחרו ההצבעות?</a> · <a href="https://shalosh4.org/terms/" target="_blank" rel="noopener">לא ממליצים על מי להצביע · תנאי שימוש</a></span>');
   $('prev').onclick = () => introScreen(0); $('nxt').onclick = () => introScreen(1);
   if ($('inext')) $('inext').onclick = () => introScreen(1);
+  if ($('iall')) $('iall').onclick = () => openBrowse();
   if ($('start')) $('start').onclick = () => { introPg = null; $('game').classList.remove('intro'); pickScreen() };
 }
 const ARR = (id, label, dis) => `<button class="arr" id="${id}" aria-label="${label}" ${dis?'disabled':''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${id==='prev'?'M4 12h16M14 6l6 6-6 6':'M20 12H4M10 6l-6 6 6 6'}" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
@@ -1551,6 +1567,7 @@ $('menub').onclick = e => { e.stopPropagation(); const o = $('menu').hidden; $('
 document.addEventListener('click', e => { if (!e.target.closest('.menuwrap')) { $('menu').hidden = true; $('menub').setAttribute('aria-expanded','false') } });
 $('m-search').onclick = () => { $('menu').hidden = true; $('sbtn').onclick(); scrollTo({top:0}) };
 $('m-new').onclick = () => { $('menu').hidden = true; $('restart').click() };
+$('m-all').onclick = () => { $('menu').hidden = true; openBrowse() };
 document.addEventListener('click', e => { if (!e.target.closest('.info')) document.querySelectorAll('.info.open').forEach(x => { x.classList.remove('open'); x.querySelector('.ib').setAttribute('aria-expanded','false') }) });
 // search opens in place of the topic carousel; closing it brings the carousel back
 document.addEventListener('click', e => { if (!e.target.closest('.searchbox')) $('res').hidden = true });
@@ -1678,6 +1695,42 @@ function openTile(k, m){
   ov.addEventListener('keydown', e => { if (e.key === 'Escape') close() }); ov.querySelector('.sclose').focus();
   const sb = ov.querySelector('#tshare'); if (sb) sb.onclick = () => k === 'fac' ? shareFac(sb) : sharePage(m, k, sb);
 }
+// all the votes without playing (Lior 15.10): every bill by topic, how each faction voted, and optionally one MK
+function openBrowse(){
+  const st = {q: '', t: '', mk: '', n: 40};
+  const topics = [...new Set(D.votes.map(v => v.topic))];
+  const mks = [...D.mks].sort((a, b) => a.name.localeCompare(b.name, 'he'));
+  const ov = document.createElement('div'); ov.className = 'tileov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'כל ההצבעות');
+  ov.innerHTML = `<div class="tilebox vbox"><div class="tilehd"><h2>כל ההצבעות</h2><button class="sclose" aria-label="סגירה">×</button></div>
+    <p class="vsub">${D.votes.length} הצעות חוק מהכנסת ה־25, ואיך הצביעה כל סיעה במליאה. נגיעה בחוק מראה מה הוא אומר.</p>
+    <div class="vctl"><input id="vq" type="search" placeholder="חיפוש חוק" aria-label="חיפוש חוק">
+      <select id="vt" aria-label="נושא"><option value="">כל הנושאים</option>${topics.map(t => `<option>${t}</option>`).join('')}</select>
+      <select id="vm" aria-label="חבר או חברת כנסת"><option value="">להוסיף ח"כ</option>${mks.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}</select></div>
+    <div class="cw fstory vlist" id="vlist"></div></div>`;
+  document.body.appendChild(ov); document.documentElement.classList.add('ovlock');
+  const close = () => { ov.remove(); document.documentElement.classList.remove('ovlock'); if (location.hash === '#votes') history.replaceState(null, '', location.pathname + location.search) };
+  ov.querySelector('.sclose').onclick = close; ov.addEventListener('keydown', e => { if (e.key === 'Escape') close() });
+  const W = {F: 'בעד', A: 'נגד', B: 'נמנע', N: 'לא הצביע', '-': 'לא כיהן'};
+  const draw = () => {
+    const q = st.q.trim(), mk = st.mk && D.mks.find(m => String(m.id) === st.mk);
+    const vs = D.votes.filter(v => (!st.t || v.topic === st.t) && (!q || (v.label + ' ' + (v.ex || '')).includes(q))).sort((a, b) => b.date.localeCompare(a.date));
+    const show = vs.slice(0, st.n);
+    const fs = [...D.fac.filter(f => f.s === 'c'), ...D.fac.filter(f => f.s !== 'c')].filter(f => show.some(v => ans(f, v) !== '-'));
+    const head = `<div class="fgr fghd vhd">${mk ? '<span class="vmkh">' + mk.name + '</span>' : ''}<span class="fgl"></span>${fs.map(f => `<span class="fgf"><small>${FSHORT[f.id] || f.name}</small></span>`).join('')}</div>`;
+    const row = v => { const a = mk && ans(mk, v);
+      return `<div class="vrow"><div class="fgr" data-id="${v.id}">${mk ? `<b class="vmk ${a === '-' ? 'X' : a}">${W[a] || ''}</b>` : ''}<span class="fgl">${v.label}</span>${fs.map(f => { const x = ans(f, v); return `<i class="fc ${x === '-' ? 'X' : x}" title="${f.name}: ${FW[x] || ''}"></i>` }).join('')}</div>
+        <div class="vex2" hidden><small>${v.topic} · ${fmtDate(v.date)}</small>${v.ex ? `<p>${v.ex}</p>` : ''}</div></div>` };
+    $('vlist').innerHTML = `<div class="fg ${mk ? 'vwithmk' : ''}" style="--n:${fs.length}">${head}${show.map(row).join('')}</div>
+      ${vs.length ? '' : '<p class="vnone">לא נמצאו חוקים</p>'}${vs.length > show.length ? `<button class="btn ghost dark vmore" id="vmore">עוד ${Math.min(40, vs.length - show.length)} מתוך ${vs.length - show.length}</button>` : ''}
+      <p class="fgnote">${facLegend(show, true)}הצבעת סיעה = איך הצביעו רוב חבריה שהשתתפו בהצבעה. מימין הקואליציה, משמאל האופוזיציה. ההצבעה היא האחרונה על החוק כולו, במליאה.</p>`;
+    $('vlist').querySelectorAll('.vrow .fgr').forEach(r => r.onclick = () => { const e = r.nextElementSibling; e.hidden = !e.hidden });
+    const mo = $('vmore'); if (mo) mo.onclick = () => { st.n += 40; draw() };
+  };
+  $('vq').oninput = e => { st.q = e.target.value; st.n = 40; draw() };
+  $('vt').onchange = e => { st.t = e.target.value; st.n = 40; draw() };
+  $('vm').onchange = e => { st.mk = e.target.value; draw() };
+  draw(); ov.querySelector('.sclose').focus();
+}
 // one of the four story images on its own
 async function sharePage(m, k, btn){
   const old = btn.textContent; btn.disabled = true; btn.textContent = 'מכינים תמונה...';
@@ -1692,9 +1745,9 @@ async function sharePage(m, k, btn){
 const FSHORT = {f8: 'כחול לבן', f11: 'חד"ש תע"ל'};
 const FW = {F: 'בעד', A: 'נגד', B: 'נמנעה', S: 'התפצלה', N: 'לא השתתפה', '-': 'לא הייתה'};
 // the shared image has colours only in the cells (too small for words on a phone, Lior 14.10), so it gets a legend on top
-function facLegend(vs){
+function facLegend(vs, small){
   const u = new Set(vs.flatMap(v => D.fac.map(f => ans(f, v))));
-  return `<div class="fleg"><span><i class="fc F"></i>בעד</span><span><i class="fc A"></i>נגד</span>${u.has('B') ? '<span><i class="fc B"></i>נמנעה</span>' : ''}${u.has('N') ? '<span><i class="fc N"></i>לא השתתפה</span>' : ''}${u.has('S') ? '<span><i class="fc S"></i>התפצלה</span>' : ''}</div>`;
+  return `<span class="fleg${small ? ' fleg2' : ''}"><span><i class="fc F"></i>בעד</span><span><i class="fc A"></i>נגד</span>${u.has('B') ? '<span><i class="fc B"></i>נמנעה</span>' : ''}${u.has('N') ? '<span><i class="fc N"></i>לא השתתפה</span>' : ''}${u.has('S') ? '<span><i class="fc S"></i>התפצלה</span>' : ''}</span>`;
 }
 function facGrid(vs, story){
   // a faction that was not in the Knesset for any of these bills gets no column
@@ -1709,7 +1762,7 @@ function facGrid(vs, story){
     `<div class="fgr"><span class="fgl">${v.label}</span>${fs.map((f, k) => cell(ans(f, v), k)).join('')}</div>`).join('')).join('');
   const used = new Set(vs.flatMap(v => fs.map(f => ans(f, v))));
   return `<div class="fg" style="--c:${o1};--o:${fs.length - o1};--n:${fs.length}">${head}${rows}</div>
-    <p class="fgnote">${story ? 'הצבעת סיעה = איך הצביעו רוב חבריה.' : 'הצבעת סיעה = איך הצביעו רוב חברי הסיעה שהשתתפו בהצבעה. מימין הקואליציה, משמאל האופוזיציה.'}${used.has('N') ? '<br>– = הסיעה לא השתתפה בהצבעה' : ''}${used.has('S') ? '<br><i class="fc S"></i> = הסיעה התפצלה (מספר שווה בעד ונגד)' : ''}</p>`;
+    <p class="fgnote">${story ? facLegend(vs, true) + 'הצבעת סיעה = איך הצביעו רוב חבריה.' : 'הצבעת סיעה = איך הצביעו רוב חברי הסיעה שהשתתפו בהצבעה. מימין הקואליציה, משמאל האופוזיציה.'}${used.has('N') && !story ? '<br>– = הסיעה לא השתתפה בהצבעה' : ''}${used.has('S') && !story ? '<br><i class="fc S"></i> = הסיעה התפצלה (מספר שווה בעד ונגד)' : ''}</p>`;
 }
 const facVotes = () => asked.filter(id => revealed[id]).map(id => byId[id]);
 // the shared image: 9:16 like the summary stories, without the player's own vote; up to 9 bills
@@ -1717,7 +1770,7 @@ function facStory(max = 10){
   const vs = facVotes(), k = vs.slice(0, max), left = vs.length - k.length;
   return `<div class="cw story fstory"><article class="fgcard">${SKICK}<h2 class="fsh">איך הצביעו הסיעות?</h2>
     <p class="fgsub">${k.length === 1 ? 'הצעת חוק אחת' : k.length + ' הצעות חוק'} מהכנסת ה־25, ואיך הצביעה כל סיעה</p>
-    ${facLegend(k)}${facGrid(k, true)}${left ? `<p class="smore">ועוד ${left} הצבעות באתר</p>` : ''}
+    ${facGrid(k, true)}${left ? `<p class="smore">ועוד ${left} הצבעות באתר</p>` : ''}
     <p class="ssrc">נתוני הצבעה אמיתיים ממליאת הכנסת ה־25</p><div class="sfoot"><span>shalosh4.org/kise<small dir="ltr"><svg class="igi" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.4" cy="6.6" r="1.4" fill="currentColor"/></svg>@einatbenari</small></span><img src="${LOGO}" alt=""></div></article></div>`;
 }
 // the text that goes with a shared image (Lior 14.10: say what this is)
@@ -1922,6 +1975,7 @@ if (BACKEND === 'site') {
       if (r.ok) Object.assign(sent, t) } catch (e) { /* offline: keep playing locally */ } };
   // share counts (Lior 13.10): completed shares, saved images, and visits from a shared link (?s=1); never from the preview copy
   logShare = (kind, how, target) => { if (PREVIEW) return; try { fetch('/api/share', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({kind, how, target: target == null ? null : String(target)}), keepalive: true}).catch(() => {}) } catch (e) {} };
+  if (location.hash === '#votes') setTimeout(openBrowse, 300);
   try { if (new URLSearchParams(location.search).get('s')) { logShare('open'); history.replaceState(null, '', location.pathname + location.hash) } } catch (e) {}
   sendReport = async (vote, text) => { try { return (await fetch('/api/report', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({vote, text})})).ok } catch (e) { return false } };
 } else {
