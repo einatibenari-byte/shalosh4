@@ -1143,10 +1143,10 @@ span.tlink{text-decoration:none}
 .fstory .fsh{margin:0;text-align:center;font:700 8cqi/1.1 var(--head,var(--body));color:var(--navy)}
 .fstory .fgsub{text-align:center;font-size:4cqi;margin:1cqi 0 2.4cqi}
 .fstory .fgl{font-size:4cqi;font-weight:700;line-height:1.12}.fstory .fg{gap:1.2cqi}
-.fstory .fgr{grid-template-columns:50% repeat(var(--c),minmax(0,1fr)) 2cqi repeat(var(--o),minmax(0,1fr));gap:.5cqi}
+.fstory .fgr{grid-template-columns:50% repeat(var(--n),minmax(0,1fr));gap:.5cqi}
 .fstory .fg .fc{height:8cqi;color:transparent;border-radius:1.2cqi}
 .fstory .fgt{font-size:5.2cqi;margin-top:2.6cqi}
-.fstory .fgf small{writing-mode:vertical-rl;transform:rotate(180deg);font-size:2.8cqi;font-weight:800;white-space:nowrap;min-height:0;text-align:start;line-height:1}
+.fstory .fgf small{writing-mode:vertical-rl;transform:rotate(180deg);font-size:2.7cqi;font-weight:700;white-space:nowrap;min-height:0;text-align:start;line-height:1}
 .fstory .fgf{flex-direction:column-reverse;gap:1.2cqi}
 .fstory .fgnote{font-size:3.2cqi;line-height:1.35}
 .fleg{display:flex;justify-content:center;flex-wrap:wrap;gap:1.4cqi 3cqi;margin:0 0 1.6cqi;font-size:4cqi;font-weight:800;color:var(--navy)}
@@ -1699,17 +1699,17 @@ function facLegend(vs){
 function facGrid(vs, story){
   // a faction that was not in the Knesset for any of these bills gets no column
   const fs = [...D.fac.filter(f => f.s === 'c'), ...D.fac.filter(f => f.s !== 'c')].filter(f => vs.some(v => ans(f, v) !== '-')), o1 = fs.findIndex(f => f.s !== 'c');
-  const gap = k => k === o1 ? '<span class="fgap"></span>' : '', W = {F: 'בעד', A: 'נגד', B: 'נמנעה', S: '', N: '–', '-': ''};
+  const gap = k => !story && k === o1 ? '<span class="fgap"></span>' : '', W = {F: 'בעד', A: 'נגד', B: 'נמנעה', S: '', N: '–', '-': ''};
   const cell = (a, k) => `${gap(k)}<i class="fc ${a === '-' ? 'X' : a}" title="${FW[a] || ''}">${W[a] ?? ''}</i>`;
   const head = `<div class="fgr fghd"><span class="fgl"></span>${fs.map((f, k) =>
-    `${gap(k)}<span class="fgf"><span class="fgface">${faceOf(f)}</span><small>${FSHORT[f.id] || f.name}</small></span>`).join('')}</div>`;
+    `${gap(k)}<span class="fgf">${story ? '' : `<span class="fgface">${faceOf(f)}</span>`}<small>${FSHORT[f.id] || f.name}</small></span>`).join('')}</div>`;
   // rows grouped by topic, in the order the topics came up in the game
   const topics = [...new Set(vs.map(v => v.topic))];
   const rows = topics.map(t => `<div class="fgt">${t}</div>` + vs.filter(v => v.topic === t).map(v =>
     `<div class="fgr"><span class="fgl">${v.label}</span>${fs.map((f, k) => cell(ans(f, v), k)).join('')}</div>`).join('')).join('');
   const used = new Set(vs.flatMap(v => fs.map(f => ans(f, v))));
-  return `<div class="fg" style="--c:${o1};--o:${fs.length - o1}">${head}${rows}</div>
-    <p class="fgnote">${story ? 'מימין הקואליציה, משמאל האופוזיציה. הצבעת סיעה = איך הצביעו רוב חבריה.' : 'הצבעת סיעה = איך הצביעו רוב חברי הסיעה שהשתתפו בהצבעה. מימין הקואליציה, משמאל האופוזיציה.'}${used.has('N') ? '<br>– = הסיעה לא השתתפה בהצבעה' : ''}${used.has('S') ? '<br><i class="fc S"></i> = הסיעה התפצלה (מספר שווה בעד ונגד)' : ''}</p>`;
+  return `<div class="fg" style="--c:${o1};--o:${fs.length - o1};--n:${fs.length}">${head}${rows}</div>
+    <p class="fgnote">${story ? 'הצבעת סיעה = איך הצביעו רוב חבריה.' : 'הצבעת סיעה = איך הצביעו רוב חברי הסיעה שהשתתפו בהצבעה. מימין הקואליציה, משמאל האופוזיציה.'}${used.has('N') ? '<br>– = הסיעה לא השתתפה בהצבעה' : ''}${used.has('S') ? '<br><i class="fc S"></i> = הסיעה התפצלה (מספר שווה בעד ונגד)' : ''}</p>`;
 }
 const facVotes = () => asked.filter(id => revealed[id]).map(id => byId[id]);
 // the shared image: 9:16 like the summary stories, without the player's own vote; up to 9 bills
